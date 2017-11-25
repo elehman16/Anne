@@ -1,5 +1,6 @@
 import abc
 import csv
+import sqlite3
 
 import article
 
@@ -59,3 +60,33 @@ class CSVReader(Reader):
         return article.Article(id_=entry['id'],
                                title=entry['title'],
                                text=entry['text'])
+
+
+class SQLiteReader(Reader):
+    """Read from a SQLite database.
+
+    A `Reader` implementation to read articles from
+    a SQLite database. Requires that there exist columns
+    titled 'title' and 'text' and that the rows are
+    uniquely id'd beginning at 0.
+    """
+
+    def __init__(self, db_file, table):
+        self.db_file = db_file
+        self.table = table
+        self.conn = sqlite3.connect(self.db_file)
+        self.conn.text_factory = str
+        self.cursor = self.conn.cursor()
+        self.current_pos = 0
+
+    def get_next_article(self):
+        self.cursor.execute('SELECT title, text FROM {0} WHERE id={1}' \
+                            .format(self.table, self.current_pos))
+        articles = self.cursor.fetchall()
+        if not articles or len(articles) != 1:
+            return None
+        art = article.Article(id_=self.current_pos,
+                              title=articles[0][0],
+                              text=articles[0][1])
+        self.current_pos += 1
+        return art

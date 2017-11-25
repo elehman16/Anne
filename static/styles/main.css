@@ -1,0 +1,52 @@
+#welcome {
+    margin-top: 5%;
+    text-align: center;
+    color: black;
+}
+
+#title {
+    text-align: center;
+    padding-bottom: 3%;
+}
+
+#text {
+  text-align: center;
+}
+
+#quote-row {
+    text-align: center;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+span {
+    font-weight: bold;
+}
+
+label {
+    font-weight: 500;
+}
+
+.buttons {
+    text-align: center;
+    margin-bottom: 2%;
+}
+
+#select h4 {
+    margin-top: 5%;
+    text-align: center;
+}
+
+#check-warning, #warning {
+    text-align: center;
+    color: red;
+    visibility: hidden;
+}
+
+#store {
+    visibility: hidden;
+}
+
+#finish {
+    text-align: center;
+}

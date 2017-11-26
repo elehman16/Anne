@@ -37,7 +37,7 @@ label {
     text-align: center;
 }
 
-#check-warning, #warning {
+#warning {
     text-align: center;
     color: red;
     visibility: hidden;

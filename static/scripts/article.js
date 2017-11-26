@@ -38,7 +38,7 @@ function add() {
     $("#warning").empty();
 }
 
-function getFinalText(){
+function getFinalText() {
     var results = [];
     var annotations = $("#selected li");
     annotations.each(function(idx, li) {
@@ -48,12 +48,11 @@ function getFinalText(){
 }
 
 function submit() {
-    console.log("submits");
     var userid = document.getElementById("userid").innerHTML;
     var id = document.getElementById("id").innerHTML;
     var annotations = getFinalText();
     if (annotations.length > 0) {
-        post("/submit/", {'userid': userid, 'id': id, 'annotations': JSON.stringify(annotations)});
+        post("/submit/", {"userid": userid, "id": id, "annotations": JSON.stringify(annotations)});
     }
 }
 

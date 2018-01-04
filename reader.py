@@ -1,6 +1,9 @@
 import abc
 import csv
+import os
+import random
 import sqlite3
+import xml.etree.ElementTree
 
 import article
 
@@ -101,10 +104,31 @@ class XMLReader(Reader):
     """
 
     def __init__(self, path):
-        pass
+        self.path = path
 
     def _get_next_file(self):
-        pass
+        try:
+            next_file = random.choice(os.listdir(self.path))
+        except IndexError as _:
+            # Provided path has no files
+            return None
+        return next_file
 
     def get_next_article(self):
-        pass
+        path_to_file =  self.path + '/' + self._get_next_file()
+        et = xml.etree.ElementTree.parse(path_to_file)
+        root = et.getroot()
+
+        # TODO
+        # id = pmid of article
+        # title = title of article
+
+        body = root.getchildren()[1]
+        text = []
+        for child in body:
+            text.append(''.join(child.itertext()))
+        text = '\n'.join(text)
+
+        return article.Article(id_=0,
+                               title='',
+                               text=text)

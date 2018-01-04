@@ -90,3 +90,21 @@ class SQLiteReader(Reader):
                               text=articles[0][1])
         self.current_pos += 1
         return art
+
+
+class XMLReader(Reader):
+    """Read from XML files.
+
+    A `Reader` implementation to read articles from XML files
+    that are stored in a given path. Currently expects files to
+    be of the form of an NLM article.
+    """
+
+    def __init__(self, path):
+        pass
+
+    def _get_next_file(self):
+        pass
+
+    def get_next_article(self):
+        pass

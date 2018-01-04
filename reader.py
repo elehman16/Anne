@@ -119,16 +119,23 @@ class XMLReader(Reader):
         et = xml.etree.ElementTree.parse(path_to_file)
         root = et.getroot()
 
-        # TODO
-        # id = pmid of article
-        # title = title of article
+        front = root.find('front')
+        article_meta = front.find('article-meta')
 
-        body = root.getchildren()[1]
+        ids = article_meta.findall('article-id')
+        id_ = None
+        for id in ids:
+            if 'pub-id-type' in id.attrib and id.attrib['pub-id-type'] == 'pmid':
+                id_ = id.text
+
+        title = article_meta.find('title-group').find('article-title').text
+
+        body = root.find('body')
         text = []
         for child in body:
             text.append(''.join(child.itertext()))
         text = '\n'.join(text)
 
-        return article.Article(id_=0,
-                               title='',
+        return article.Article(id_=id_,
+                               title=title,
                                text=text)

@@ -37,10 +37,18 @@ label {
     text-align: center;
 }
 
-#warning {
+.warning {
     text-align: center;
     color: red;
     visibility: hidden;
+}
+
+#checkbox-list {
+    list-style-type: none;
+}
+
+#checkbox-list label {
+    margin-left: 10px;
 }
 
 #store {

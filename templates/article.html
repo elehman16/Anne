@@ -16,8 +16,21 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-5 col-md-offset-6">
-                <div class="row" id="warning">
+            <div class="col-md-4 col-md-offset-1">
+                {% if options %}
+                    <div class="row warning">
+                    </div>
+                    <div class="row">
+                        <ul id="checkbox-list">
+                            {% for option in options %}
+                                <li><input type="checkbox"/><label>{{ option }}</label></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-md-5 col-md-offset-1">
+                <div class="row" "warning">
                 </div>
                 <div class="row buttons">
                     <div class="col-md-6">

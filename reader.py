@@ -136,3 +136,14 @@ class XMLReader(Reader):
         return article.Article(id_=id_,
                                title=title,
                                text=text)
+
+
+def get_reader(reader):
+    options = {
+        'csv': CSVReader,
+        'sql': SQLiteReader,
+        'xml': XMLReader
+    }
+    if reader in options:
+        return options[reader]
+    raise Exception('{0} not a valid reader.'.format(reader))

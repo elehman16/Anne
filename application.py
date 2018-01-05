@@ -3,13 +3,15 @@ import json
 
 import annotator
 import article
+import config
 import reader
 import writer
 
 
 application = flask.Flask(__name__)
 
-anne = annotator.Annotator(reader.Reader(), writer.Writer())
+anne = annotator.Annotator(reader.get_reader(config.reader)(**config.reader_params),
+                           writer.get_writer(config.writer)(**config.writer_params))
 
 
 @application.route('/', methods=['GET'])
@@ -30,7 +32,8 @@ def annotate(userid):
                                  userid=userid,
                                  id=art.id_,
                                  title=art.title,
-                                 text=art.text)
+                                 text=art.text,
+                                 options=config.options)
 
 @application.route('/submit/', methods=['POST'])
 def submit():

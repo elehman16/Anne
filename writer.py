@@ -79,3 +79,13 @@ class SQLiteWriter(Writer):
         self.cursor.execute('SELECT * FROM {0}'.format(self.table))
         rows = self.cursor.fetchall()
         return json.dumps(rows)
+
+
+def get_writer(writer):
+    options = {
+        'csv': CSVWriter,
+        'sql': SQLiteWriter,
+    }
+    if writer in options:
+        return options[writer]
+    raise Exception('{0} not a valid writer.'.format(writer))

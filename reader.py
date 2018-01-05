@@ -131,10 +131,7 @@ class XMLReader(Reader):
         title = article_meta.find('title-group').find('article-title').text
 
         body = root.find('body')
-        text = []
-        for child in body:
-            text.append(''.join(child.itertext()))
-        text = '\n'.join(text)
+        text = xml.etree.ElementTree.tostring(body).decode('utf-8')
 
         return article.Article(id_=id_,
                                title=title,

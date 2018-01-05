@@ -114,8 +114,11 @@ class XMLReader(Reader):
             return None
         return next_file
 
-    def get_next_article(self):
-        path_to_file =  self.path + '/' + self._get_next_file()
+    def get_next_article(self, next_file=None):
+        next_file = next_file or self._get_next_file()
+        if not next_file:
+            return None
+        path_to_file =  self.path + '/' + next_file
         et = xml.etree.ElementTree.parse(path_to_file)
         root = et.getroot()
 

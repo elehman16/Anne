@@ -21,7 +21,7 @@ function checkFromLabel() {
     document.getElementById("check-warning").style.visibility = "hidden";
 }
 
-function getSelectionText() {
+function getSelectedText() {
     var text = "";
 
     if (window.getSelection) {
@@ -46,7 +46,7 @@ function isAlreadyHighlighted(highlighted) {
 }
 
 function add() {
-    var highlighted = getSelectionText();
+    var highlighted = getSelectedText();
 
     if (isAlreadyHighlighted(highlighted) === true) {
         $("#warning").append("<p>Text has already been selected.</p>")
@@ -70,18 +70,19 @@ function getFinalText() {
     return results;
 }
 
-function getSelection() {
+function getCheckBoxSelection() {
     var choice = ""
     $("input:checkbox:checked").each(function(){
         choice = $(this).next("label").text();
     });
+    return choice;
 }
 
 function submit() {
     var userid = document.getElementById("userid").innerHTML;
     var id = document.getElementById("id").innerHTML;
     var annotations = getFinalText();
-    var selection = getSelection();
+    var selection = getCheckBoxSelection();
     if (annotations.length > 0) {
         post("/submit/", {"userid": userid, "id": id,
                           "annotations": JSON.stringify(annotations),

@@ -132,8 +132,9 @@ class XMLReader(Reader):
                 id_ = id.text
 
         title = article_meta.find('title-group').find('article-title').text
-
-        body = root.find('body')
+        body = root.find('body') or root.find('abstract')
+        if body is None:
+            return None
         text = xml.etree.ElementTree.tostring(body).decode('utf-8')
 
         return article.Article(id_=id_,

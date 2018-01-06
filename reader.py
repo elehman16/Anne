@@ -142,11 +142,39 @@ class XMLReader(Reader):
                                text=text)
 
 
+class ResearchReader(Reader):
+    """Read from a combination of CSV/XML files.
+
+    A custom reader to support research work.
+    """
+
+    def __init__(self, csv_file, path_to_xml_files):
+        with open(csv_file, 'r') as f:
+            self.entries = list(csv.DictReader(f))
+        self.curr_idx = 0
+        self.max_idx = len(self.entries) - 1
+        self.xml_reader = XMLReader(path_to_xml_files)
+
+    def get_next_article(self):
+        if self.curr_idx > self.max_idx:
+            return None
+
+        entry = self.entries[self.curr_idx]
+        self.curr_idx += 1
+
+        art = self.xml_reader.get_next_article(entry['XML_file_names'])
+        if art is None:
+            return self.get_next_article()
+        art.entry = entry
+        return art
+
+
 def get_reader(reader):
     options = {
         'csv': CSVReader,
         'sql': SQLiteReader,
-        'xml': XMLReader
+        'xml': XMLReader,
+        'research': ResearchReader
     }
     if reader in options:
         return options[reader]

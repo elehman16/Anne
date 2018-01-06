@@ -9,6 +9,18 @@ function preventMultiCheck() {
     }
 }
 
+function checkFromLabel() {
+    box = $(this).prev('input');
+    if(box.is(":checked")) {
+        box.prop("checked", false);
+    } else {
+        var group = "input:checkbox";
+        $(group).prop("checked", false);
+        box.prop("checked", true);
+    }
+    document.getElementById("check-warning").style.visibility = "hidden";
+}
+
 function getSelectionText() {
     var text = "";
 
@@ -88,6 +100,7 @@ function clear() {
 }
 
 $("input:checkbox").click(preventMultiCheck);
+$("label").click(checkFromLabel);
 $("#add-but").click(add);
 $("#submit-but").click(submit);
 $("#clear-but").click(clear);

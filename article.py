@@ -11,3 +11,8 @@ class Article(object):
         self.id_ = id_
         self.title = title
         self.text = text
+        self.extra = {}
+
+    def get_extra(self):
+        """Returns a dictionary of any extra variables required"""
+        return self.extra

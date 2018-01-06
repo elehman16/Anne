@@ -33,6 +33,7 @@ def annotate(userid):
                                  id=art.id_,
                                  title=art.title,
                                  text=art.text,
+                                 extra=art.get_extra(),
                                  options=config.options)
 
 @application.route('/submit/', methods=['POST'])

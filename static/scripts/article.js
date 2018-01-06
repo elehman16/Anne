@@ -24,13 +24,13 @@ function getSelectionText() {
 }
 
 function isAlreadyHighlighted(highlighted) {
-  var highlights = getFinalText();
-  for (var i = 0; i < highlights.length; i++) {
-      if (highlights[i].includes(highlighted)) {
-          return true;
-      }
-  }
-  return false;
+    var highlights = getFinalText();
+    for (var i = 0; i < highlights.length; i++) {
+        if (highlights[i].includes(highlighted)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function add() {

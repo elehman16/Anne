@@ -11,7 +11,7 @@ class Writer(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def submit_annotation(self, id_, annotations):
+    def submit_annotation(self, article_id, annotations):
         """Submits an annotation."""
         raise NotImplementedError('Method `submit_annotation` must be defined')
 
@@ -30,16 +30,17 @@ class CSVWriter(Writer):
     in separate columns.
 
     Writes to CSV in form:
-    article_id, annotation1, annotation2, ...
+    user_id, article_id, annotation1, annotation2, ...
     """
 
     def __init__(self, write_file):
         self.write_file = write_file
 
-    def submit_annotation(self, id_, annotations):
+    def submit_annotation(self, user_id, article_id, annotations):
         with open(self.write_file, 'a') as csvfile:
-            csvfile.write('{0},"{1}"\n'.format(
-                id_,
+            csvfile.write('{0},{1},"{2}"\n'.format(
+                user_id,
+                article_id,
                 '","'.join(annotations)
             ))
 
@@ -69,10 +70,10 @@ class SQLiteWriter(Writer):
         self.cursor = self.conn.cursor()
         self.current_pos = 0
 
-    def submit_annotation(self, id_, annotations):
+    def submit_annotation(self, user_id, article_id, annotations):
         for annotation in annotations:
-            self.cursor.execute('INSERT INTO {0} VALUES({1}, {2})' \
-                                .format(self.table, id_, annotation))
+            self.cursor.execute('INSERT INTO {0} VALUES({1}, {2}, {3})' \
+                                .format(self.table, user_id, article_id, annotation))
         self.cursor.commit()
 
     def get_results(self):

@@ -23,13 +23,13 @@ def start():
     userid = flask.request.form['userid']
     return flask.redirect(flask.url_for('annotate', userid=userid))
 
-@application.route('/annotate/<userid>', methods=['GET'])
-def annotate(userid):
+@application.route('/annotate/<user_id>', methods=['GET'])
+def annotate(user_id):
     art = anne.get_next_article()
     if not art:
         return flask.redirect(flask.url_for('finish'))
     return flask.render_template('article.html',
-                                 userid=userid,
+                                 userid=user_id,
                                  id=art.id_,
                                  title=art.title,
                                  text=art.text,
@@ -38,12 +38,12 @@ def annotate(userid):
 
 @application.route('/submit/', methods=['POST'])
 def submit():
-    userid = flask.request.form['userid']
-    id_ = flask.request.form['id']
+    user_id = flask.request.form['userid']
+    article_id = flask.request.form['id']
     annotations = flask.request.form['annotations']
     annotations = json.loads(annotations)
-    anne.submit_annotation(id_, annotations)
-    return flask.redirect(flask.url_for('annotate', userid=userid))
+    anne.submit_annotation(user_id, article_id, annotations)
+    return flask.redirect(flask.url_for('annotate', user_id=user_id))
 
 @application.route('/finish/', methods=['GET'])
 def finish():

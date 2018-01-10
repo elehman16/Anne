@@ -1,18 +1,24 @@
-
 # The reader to use, along with the paramaters that
 # it accepts in it's constructor
 #
 # Options: csv, sql, xml
-reader = ''
-reader_params = {}
+reader = 'xml'
+reader_params = {
+    'path': 'path_my_xml_files'
+}
 
 # The writer to use, along with the paramaters that
 # it accepts in its constructor
 #
 # Options: csv, sql
-writer = ''
-writer_params = {}
+writer = 'csv'
+writer_params = {
+    'write_file': 'output.csv'
+}
 
 # If an additional list of checkboxes should be added
 # to the interface, the options to be provided
-options = []
+options = [
+    'yes',
+    'no'
+]

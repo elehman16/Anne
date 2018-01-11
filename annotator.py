@@ -15,8 +15,8 @@ class Annotator(object):
     def get_next_article(self):
         return self.reader.get_next_article()
 
-    def submit_annotation(self, id_, annotations):
-        return self.writer.submit_annotation(id_, annotations)
+    def submit_annotation(self, **kwargs):
+        return self.writer.submit_annotation(**kwargs)
 
     def get_results(self):
         return self.writer.get_results()

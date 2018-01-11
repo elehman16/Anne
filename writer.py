@@ -40,7 +40,8 @@ class CSVWriter(Writer):
     def submit_annotation(self, user_id, article_id, annotations, selection=None):
         selection_text = ''
         if selection:
-            selection_text = ', "{0}", '.format(selection)
+            selection_text = '"{0}",'.format(selection)
+
         with open(self.write_file, 'a') as csvfile:
             csvfile.write('{0},{1},{2}"{3}"\n'.format(
                 user_id,

@@ -27,20 +27,25 @@ class CSVWriter(Writer):
     A `Writer` implementation that writes annotation
     information out to a CSV file. If multiple annotations
     for a single article are provided, they are entered
-    in separate columns.
+    in separate columns. If provided, a selection will try
+    to be saved as well.
 
     Writes to CSV in form:
-    user_id, article_id, annotation1, annotation2, ...
+    user_id, article_id, (selection), annotation1, annotation2, ...
     """
 
     def __init__(self, write_file):
         self.write_file = write_file
 
-    def submit_annotation(self, user_id, article_id, annotations):
+    def submit_annotation(self, user_id, article_id, annotations, selection=None):
+        selection_text = ''
+        if selection:
+            selection_text = ', "{0}", '.format(selection)
         with open(self.write_file, 'a') as csvfile:
-            csvfile.write('{0},{1},"{2}"\n'.format(
+            csvfile.write('{0},{1},{2}"{3}"\n'.format(
                 user_id,
                 article_id,
+                selection_text,
                 '","'.join(annotations)
             ))
 
@@ -56,10 +61,11 @@ class SQLiteWriter(Writer):
     A `Writer` implementation to support writing
     annotation data out to a database. If multiple
     annotations exist for one Article, they will
-    be entered as separate rows in the database.
+    be entered as separate rows in the database. If
+    provided, a selection will try to be saved as well.
 
     Expects columns of form:
-    article_id, annotation
+    user_id, article_id, (selection), annotation
     """
 
     def __init__(self, db_file, table):
@@ -68,12 +74,16 @@ class SQLiteWriter(Writer):
         self.conn = sqlite3.connect(self.db_file)
         self.conn.text_factory = str
         self.cursor = self.conn.cursor()
-        self.current_pos = 0
 
-    def submit_annotation(self, user_id, article_id, annotations):
+    def submit_annotation(self, user_id, article_id, annotations, selection=None):
+        selection_text = ''
+        if selection:
+            selection_text = ', {0}, '.format(selection)
+
+        query = 'INSERT INTO {0} VALUES({1}, {2},{3}{4})' \
+                .format(self.table, user_id, article_id, selection_text, annotation)
         for annotation in annotations:
-            self.cursor.execute('INSERT INTO {0} VALUES({1}, {2}, {3})' \
-                                .format(self.table, user_id, article_id, annotation))
+            self.cursor.execute(query.format(annotation))
         self.cursor.commit()
 
     def get_results(self):

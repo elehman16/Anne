@@ -42,7 +42,8 @@ def submit():
     article_id = flask.request.form['id']
     annotations = flask.request.form['annotations']
     annotations = json.loads(annotations)
-    anne.submit_annotation(user_id, article_id, annotations)
+    selection = flask.request.form['selection']
+    anne.submit_annotation(user_id, article_id, annotations, selection)
     return flask.redirect(flask.url_for('annotate', user_id=user_id))
 
 @application.route('/finish/', methods=['GET'])

@@ -71,7 +71,7 @@ function getFinalText() {
 }
 
 function getCheckBoxSelection() {
-    var choice = ""
+    var choice = "";
     $("input:checkbox:checked").each(function(){
         choice = $(this).next("label").text();
     });

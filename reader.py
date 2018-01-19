@@ -4,6 +4,8 @@ import os
 import random
 import sqlite3
 import xml.etree.ElementTree as ET
+from get_file_description import get_file_description
+import numpy as np
 
 import article
 
@@ -108,6 +110,7 @@ class XMLReader(Reader):
 
     def __init__(self, path):
         self.path = path
+        self.file_description = get_file_description()
 
     """
     Given the path that leads to a folder of ONLY XML files, the function
@@ -194,15 +197,31 @@ class XMLReader(Reader):
     Initialize the article to have the proper fields and extra information.
     """
     def _init_article_(self, next_file, article_meta, body):
-        id_ = self._get_ids(article_meta)
-        title = self._get_title(article_meta)     
-        abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8') 
-        text = self._get_sections(body) #self._get_full_text(body)
-        text.insert(0, ['Abstract', abstract])
-        
+        id_ = self._get_ids(article_meta) # PMC1784771
+        title = self._get_title(article_meta)   
+        try:
+            abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8') 
+        except:
+            abstract_sections = self._get_sections(article_meta.find('abstract'))
+            abstract = ''        
+            for part in abstract_sections:
+                abstract += part[1]
+                
+        if not(body is None):
+            text = self._get_sections(body) #self._get_full_text(body)
+            text.insert(0, ['Abstract', abstract])
+        else:
+            text = [['Abstract', abstract]]
+            
         # store the path of this file
-        art = article.Article(id_=id_, title=title, text=text)
+        art = article.Article(id_= id_, title=title, text=text)
         art.get_extra()['path'] = next_file
+                
+        file_data = self.file_description[int(id_)]
+        sp_file_data = file_data[np.random.randint(len(file_data))]
+        art.get_extra()['outcome'] = sp_file_data['outcome_name']
+        art.get_extra()['comparator'] = sp_file_data['intervention1']
+        art.get_extra()['intervention'] = sp_file_data['intervention2']
         
         # only get the abstract if the next_file is None or it doesn't exist
         if (not(abstract is None) and not(next_file is None)):
@@ -218,6 +237,7 @@ class XMLReader(Reader):
     """
     def get_next_article(self, next_file=None):
         next_file = next_file or self._get_next_file()
+
         if not next_file:
             return None
         path_to_file =  self.path + '/' + next_file # the path to XML files
@@ -227,16 +247,16 @@ class XMLReader(Reader):
         front = root.find('front')
         article_meta = front.find('article-meta')
         body = root.find('body')
-        if body is None:
-            return None
-        
+       
         try:
-            article = self._init_article_(next_file, article_meta, body)
-            return article
+            art = self._init_article_(next_file, article_meta, body)
+            return art
         except:
             return self.get_next_article()
 
-
+"""
+Builder pattern for readers.
+"""
 def get_reader(reader):
     options = {
         'csv': CSVReader,

@@ -32,7 +32,7 @@ class CSVReader(Reader):
     """
 
     '''
-    @param read_file represents a csv file location.
+    @param read_file represents a csv file location
     '''
     def __init__(self, read_file, buffer_size=None):
         self.read_file = read_file

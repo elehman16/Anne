@@ -1,83 +1,244 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    </head>
-    <body>
-      <!-- Add in a title. --->
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1">
-                <h2 id="title">
-                  {{ title }}</h2>
-            </div>
-        </div>
+<head>
+  <head>
+      <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+      <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  </head>
+<style>
+body {font-family: Arial;}
 
-        <!-- Abstract to display. Have a max height of 400 pixels.
-        If it goes over this limit, a scroll bar will be added.
-        -->
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1" style = "max-height: 400px; overflow: auto;">
-                <p id="text">{{ text|safe }}</p>
-            </div>
-        </div>
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
 
-        <!-- Tell the user what is going on. -->
-        <div class = "row">
-          <div class= "col-md-5 ">
-            <label style = "margin-left: 60px;">
-              With respect to <b> <i> {{ outcome }}, </i> </b> characterize the
-              reported difference between patients receiving <b> <i>
-              {{ intervention }} </i> </b> and those receiving <b> <i> {{ comparator }}.
-              </i> </b>
-            </label>
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+</style>
+</head>
+<body>
+
+  <!-- Initialize the tab with titles . -->
+  <div style = "margin-bottom:10px;">
+    <div class = "tab">
+      {% for tab in tabs %}
+        <button id = 'link_{{ tab[0] }}' class="tablinks" onclick="openTab(event, '{{ tab[0] }}')">{{ tab[0] }}</button>
+      {% endfor %}
+
+    </div>
+
+    <!-- Create a place to put content for each tab. -->
+    {%for tab in tabs %}
+    <div id = '{{ tab[0] }}', class="tabcontent" style = "max-height: 300px; overflow: auto;">
+    </div>
+    {% endfor %}
+  </div>
+
+  <hr>
+
+  <script>
+      var msg = "You cannot open this tab unless you submit that 'You cannot tell based on abstract'";
+      tablinks = document.getElementsByClassName("tablinks"); // get all tabs
+
+      // go through and disable all tabs
+      for (var i = 0; i < tablinks.length; i++) {
+
+        // Disable all tabs except the abstract, and put a message over it
+        if (tablinks[i].id !== 'link_Abstract' && tablinks[i].id !== 'link_Title') {
+          tablinks[i].disabled = true;
+          tablinks[i].title = msg;
+        } else {
+          tablinks[i].disabled = false;
+        }
+      }
+
+  </script>
+
+  <script>
+
+    /**
+    * Displays the information in the tab when clicked on.
+    *
+    * @param evt represents what happend with the tab.
+    * @param name represents which tab to open.
+    */
+    function openTab(evt, name) {
+        var i, tabcontent, tablinks;
+        var msg = "You cannot open this tab unless you submit that 'You cannot tell based on the abstract'";
+
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        document.getElementById(name).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+  </script>
+
+
+  <script>
+
+  /**
+  * Used to break down a Text into a readable format (see data-definition below).
+  *
+  * @param orig_tab represents the parent HTML element if it exists.
+  * @param text is of the following data definition:
+  * Text is one of:
+  *    - Array of Text
+  *    - ['title', 'paragraph']
+  *    - ['title', Text]
+  */
+  function breakDownText(text, orig_tab) {
+      var copy = orig_tab;
+      if (text.length != 2 || Array.isArray(text[0])) { // there are multiple sections here if this is the case
+        for (var i = 0; i < text.length; i++) {
+          breakDownText(text[i], orig_tab); // break each of these larger sections down
+        }                                  // this is likely the beginnining with all tab headers
+      } else {
+        if (orig_tab === undefined) { // If there is no title for this section, make one.
+          var title = text[0];
+          var tab = document.getElementById(title);
+          var title_element = document.createElement("h3");
+          title_element.innerHTML = title;
+          tab.appendChild(title_element);
+          orig_tab = tab;
+        }
+
+        if (Array.isArray(text[1])) { // If there is a sub-section under this section, break it down
+          breakDownText(text[1], orig_tab);
+        } else { // otherwise add to it
+          if (copy !== undefined) {
+            var title = text[0];
+            var title_element = document.createElement("h4");
+            title_element.innerHTML = title;
+            orig_tab.appendChild(title_element);
+          }
+
+          var text_element = document.createElement("p");
+          text_element.innerHTML = text[1];
+          orig_tab.appendChild(text_element);
+        }
+      }
+
+    }
+
+    // call the function
+    var tab = {{ tabs|tojson }};
+    breakDownText(tab);
+  </script>
+
+  <!--
+  Create a row where the first component displays the reported
+  outcome/comparator/intervention, and the second part asks
+  the user which of these "options" is true.
+  -->
+  <div class = "row">
+      <label style = "margin-left: 45px;">
+        With respect to <b> <i> {{ outcome }}, </i> </b> characterize the
+        reported difference between patients receiving <b> <i>
+        {{ intervention }} </i> </b> and those receiving <b> <i> {{ comparator }}.
+        </i> </b>
+      </label>
+  </div>
+
+  <!-- Prompt to ask user to fill out information -->
+  <div class = "container-fluid" style = "margin-left: 15px; margin-top: 5px;">
+    <div class = "col-md-4">
+      <label style = "margin-left: -15px; font-size: 13px;">
+        <i> Please fill out the following information based on the statement above: </i>
+      </label>
+
+
+      {% if options %}
+          <div class="row warning" id="check-warning"> </div>
+          <div class="row">
+            <select class="form-control" id="checkbox-list">
+              <option> </option>
+              {% for option in options %}
+                  <option> {{ option }} </option>
+              {% endfor %}
+
+                  <option> Cannot tell based on the abstract </option>
+            </select>
           </div>
+      {% endif %}
 
-          <!-- Get data from python and add in a checkbox-list
-          (i.e. a drag down menu for users to select an option from
-          -->
-          <div class="col-md-4">
-            {% if options %}
-                <div class="row warning" id="check-warning">
-                </div>
-                <div class="row">
-                  <select class="form-control" id="checkbox-list">
-                    <option> </option>
-                    {% for option in options %}
-                        <option> {{ option }} </option>
-                    {% endfor %}
-                  </select>
-                </div>
-            {% endif %}
-          </div>
+      <!-- Green submit button that has a width to line up with the above drop down menu -->
+      <button type="button" id= "submit-but" class="btn btn-success" style = "margin-left: -15px; margin-top: 10px; width: 440px;" disabled>
+        Submit
+      </button>
 
+    </div>
+
+    <!-- Blank space to be used later if desired -->
+    <div class = "col-sm-2"> &nbsp; </div>
+
+    <!-- Selected Text section -->
+    <div class = "col-md-5">
+      <div class="panel panel-default">
+        <!-- Panel heading (aka title) -->
+        <div class="panel-heading">
+          <label> Support for Decision: </label>
+          <button type="button" id= "add-but" class="btn btn-default" style = "margin-left: 195px;"> Add Text </button>
+          <button type="button" id= "restart-but" class="btn btn-default" style = "margin-left: 5px;"> Clear </button>
         </div>
 
-        <!-- Set up the buttons for selecting text, clearing everything, and submitting. -->
-        <div class = "row">
-          <div class = "col-md-6" style = "margin-left: 50px;">
-            <div class="container">
-              <button type="button" id= "add-but" class="btn"> Add Text </button>
-              <button type="button" id= "restart-but" class="btn"> Clear </button>
-              <button type="button" id= "submit-but" class="btn"> Submit </button>
-            </div>
-          </div>
-
-          <!-- Initialize a place where all the selected text by the user lies. -->
-          <div class = "col-md-5">
-            <div class="row" id="select">
-                <h4> Selected Text</h4>
-                <ol id="selected"></ol>
-            </div>
-          </div>
+        <!-- Scrollable window where selected-text is displayed -->
+        <div class="panel-body" style = "height: 150px; max-height: 150px; overflow-y:scroll;">
+            <o1 id="selected"> </o1>
         </div>
+      </div>
+    </div>
 
-        <!-- Initialize a place to store the data in secret (will send to python code later) -->
-        <div id="store">
-            <p id="userid">{{ userid }}</p>
-            <p id="id">{{ id }}</p>
-        </div>
-        <script src="{{ url_for('static', filename='scripts/post.js') }}"></script>
-        <script src="{{ url_for('static', filename='scripts/article.js') }}"></script>
-    </body>
+  </div>
+
+  </div>
+
+
+  <div id="store">
+      <p id="userid">{{ userid }}</p>
+      <p id="id">{{ id }}</p>
+  </div>
+  <script src="{{ url_for('static', filename='scripts/post.js') }}"></script>
+  <script src="{{ url_for('static', filename='scripts/article.js') }}"></script>
+
+</body>
 </html>

@@ -197,16 +197,16 @@ class XMLReader(Reader):
     Initialize the article to have the proper fields and extra information.
     """
     def _init_article_(self, next_file, article_meta, body):
-        id_ = self._get_ids(article_meta) # PMC1784771
+        id_ = self._get_ids(article_meta) 
         title = self._get_title(article_meta)   
         try:
             abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8') 
         except:
             abstract_sections = self._get_sections(article_meta.find('abstract'))
-            abstract = ''        
+            abstract = []        
             for part in abstract_sections:
-                abstract += part[1]
-                
+                abstract.append([part[0], part[1]])
+                   
         if not(body is None):
             text = self._get_sections(body) #self._get_full_text(body)
             text.insert(0, ['Abstract', abstract])
@@ -218,10 +218,13 @@ class XMLReader(Reader):
         art.get_extra()['path'] = next_file
                 
         file_data = self.file_description[int(id_)]
-        sp_file_data = file_data[np.random.randint(len(file_data))]
+        sp_file_data = file_data[np.random.randint(len(file_data))] # get any random comparator
         art.get_extra()['outcome'] = sp_file_data['outcome_name']
-        art.get_extra()['comparator'] = sp_file_data['intervention1']
-        art.get_extra()['intervention'] = sp_file_data['intervention2']
+        art.get_extra()['comparator'] = sp_file_data['intervention2']
+        art.get_extra()['intervention'] = sp_file_data['intervention1']
+        
+        text.insert(0, ["Title", [['Article Title', title], 
+                                  ['PubMed Id', sp_file_data['pmid']]]])
         
         # only get the abstract if the next_file is None or it doesn't exist
         if (not(abstract is None) and not(next_file is None)):

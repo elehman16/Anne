@@ -37,23 +37,24 @@ Display just the abstract.
 """    
 @application.route('/annotate_abstract/<userid>/<id_>/', methods=['GET'])
 def annotate_abstract(userid, id_ = None):
-    if id_ is None or id_ == 'None':
-        return flask.redirect(flask.url_for('annotate', userid=userid))
-
-    art = anne.get_next_article(id_)
-    if not art or not('abstract' in art.get_extra()):
+    if id_ is None:
+        art = anne.get_next_article()
+    else:
+        art = anne.get_next_article(id_)
+    
+    if not art:
         return flask.redirect(flask.url_for('finish'))
     else:
-        global last_path; last_path = art.get_extra()['path']
+        global last_path
+        last_path = art.get_extra()['path']
         return flask.render_template('article.html',
-                                     userid=userid,
-                                     id= art.id_,
-                                     title = art.title,
-                                     text = art.get_extra()['abstract'],
+                                     userid = userid,
+                                     id_ = art.id_,
+                                     tabs = art.text,
                                      outcome = art.get_extra()['outcome'],
                                      intervention = art.get_extra()['intervention'],
                                      comparator = art.get_extra()['comparator'],
-                                     options = config.options)
+                                     options = config.options_full)
 
 """
 Always grabs a random article and displays the full text.
@@ -63,7 +64,7 @@ def annotate(userid):
     art = anne.get_next_article()
     if not art:
         return flask.redirect(flask.url_for('finish'))
-    else:   
+    else:
         return flask.render_template('article.html',
                                  userid=userid,
                                  id=art.id_,
@@ -104,10 +105,12 @@ def submit():
     selected = flask.request.form['selection']
     annotations = eval(flask.request.form['annotations'])
     
-    # put all annotations into a string and then use ... as a delimiter
+    # put all annotations into a string and then use , as a delimiter
     annotation_str = ''
-    for a in annotations:
-        annotation_str += a + "..." 
+    for i in range(len(annotations)):
+        annotation_str += annotations[i]
+        if (i != (len(annotations) - 1)):
+            annotation_str += ","                 
     
     anne.submit_annotation([id_, selected, annotation_str])
                   
@@ -115,7 +118,8 @@ def submit():
     if (selected == 'Cannot tell based on the abstract'):
         global last_path
         return flask.redirect(flask.url_for('annotate_full', 
-                                           userid=userid, id_= last_path))
+                                            userid=userid,
+                                            id_= last_path))
     elif (selected == ''): # if they haven't selected anything, do nothing
         return None
     else: # otherwise go to the next abstract

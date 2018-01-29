@@ -45,6 +45,15 @@ body {font-family: Arial;}
     border: 1px solid #ccc;
     border-top: none;
 }
+
+.invalid_prompt_text {
+  width: 570px;
+  max-width: 570px;
+  height: 300px;
+  max-height: 300px;
+  overflow: auto;
+  resize: none;
+}
 </style>
 </head>
 <body>
@@ -102,7 +111,7 @@ body {font-family: Arial;}
     */
     function breakDownText(text, orig_tab) {
       var copy = orig_tab;
-      if (text.length != 2) { // there are multiple sections here if this is the case
+      if (text.length != 2 || Array.isArray(text[0])) { // there are multiple sections here if this is the case
         for (var i = 0; i < text.length; i++) {
           breakDownText(text[i], orig_tab); // break each of these larger sections down
         }                                  // this is likely the beginnining with all tab headers
@@ -121,7 +130,7 @@ body {font-family: Arial;}
         } else { // otherwise add to it
           if (copy !== undefined) {
             var title = text[0];
-            var title_element = document.createElement("h3");
+            var title_element = document.createElement("h4");
             title_element.innerHTML = title;
             orig_tab.appendChild(title_element);
           }
@@ -139,54 +148,92 @@ body {font-family: Arial;}
     breakDownText(tab);
   </script>
 
-  <!--
-  Create a row where the first component displays the reported
-  outcome/comparator/intervention, and the second part asks
-  the user which of these "options" is true.
-  -->
-  <div class = "row">
-    <div class= "col-md-5 ">
-      <label style = "margin-left: 60px;">
-        With respect to <b> <i> {{ outcome }}, </i> </b> characterize the
-        reported difference between patients receiving <b> <i>
-        {{ intervention }} </i> </b> and those receiving <b> <i> {{ comparator }}.
-        </i> </b>
-      </label>
+
+    <!--
+    Create a row where the first component displays the reported
+    outcome/comparator/intervention, and the second part asks
+    the user which of these "options" is true.
+    -->
+    <div class = "row">
+        <label style = "margin-left: 45px;">
+          With respect to <b> <i> {{ outcome }}, </i> </b> characterize the
+          reported difference between patients receiving <b> <i>
+          {{ intervention }} </i> </b> and those receiving <b> <i> {{ comparator }}.
+          </i> </b>
+        </label>
     </div>
 
-    <!-- Create a drag down menu of the options desired. -->
-    <div class="col-md-4">
-      {% if options %}
-          <div class="row warning" id="check-warning">
-          </div>
-          <div class="row">
-            <select class="form-control" id="checkbox-list">
-              <option> </option>
-              {% for option in options %}
-                  <option> {{ option }} </option>
-              {% endfor %}
-            </select>
-          </div>
-      {% endif %}
-    </div>
-  </div>
+    <!-- Prompt to ask user to fill out information -->
+    <div class = "container-fluid" style = "margin-left: 15px; margin-top: 5px;">
+      <div class = "col-md-4">
+        <label style = "margin-left: -15px; font-size: 13px;">
+          <i> Please fill out the following information based on the statement above: </i>
+        </label>
 
-  <!-- Add in the buttons, in order to add text, clear text, and submit text. -->
-  <div class = "row">
-    <div class = "col-md-6" style = "margin-left: 50px;">
-      <div class="container">
-        <button type="button" id= "add-but" class="btn"> Add Text </button>
-        <button type="button" id= "restart-but" class="btn"> Clear </button>
-        <button type="button" id= "submit-but" class="btn"> Submit </button>
+
+        {% if options %}
+            <div class="row warning" id="check-warning"> </div>
+            <div class="row">
+              <select class="form-control" id="checkbox-list">
+                <option> </option>
+                {% for option in options %}
+                    <option> {{ option }} </option>
+                {% endfor %}
+
+                    <option> Invalid prompt </option>
+              </select>
+            </div>
+        {% endif %}
+
+        <!-- Green submit button that has a width to line up with the above drop down menu -->
+        <button type="button" id= "submit-but" class="btn btn-success" style = "margin-left: -15px; margin-top: 10px; width: 440px;" disabled>
+          Submit
+        </button>
+
       </div>
+
+      <!-- Blank space to be used later if desired -->
+      <div class = "col-sm-2"> &nbsp; </div>
+
+      <!-- Selected Text section -->
+      <div class = "col-md-5">
+        <div class="panel panel-default">
+          <!-- Panel heading (aka title) -->
+          <div class="panel-heading">
+            <label> Support for Decision: </label>
+            <button type="button" id= "add-but" class="btn btn-default" style = "margin-left: 195px;"> Add Text </button>
+            <button type="button" id= "restart-but" class="btn btn-default" style = "margin-left: 5px;"> Clear </button>
+          </div>
+
+          <!-- Scrollable window where selected-text is displayed -->
+          <div class="panel-body" style = "height: 150px; max-height: 150px; overflow-y:scroll;">
+              <o1 id="selected"> </o1>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- The section that displays the text. -->
-    <div class = "col-md-5">
-      <div class="row" id="select">
-          <h4> Selected Text</h4>
-          <ol id="selected"></ol>
+    </div>
+
+  <!-- Modal -->
+  <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h5> <b> Please explain your reasoning below: </b> </h5>
+        </div>
+        <div class="modal-body">
+          <textarea id = "response" class = "invalid_prompt_text"> </textarea>
+        </div>
+        <div class="modal-footer">
+          <button id = "invalid-submit-but" type="button" class="btn btn-success" disabled> Submit </button>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -196,6 +243,8 @@ body {font-family: Arial;}
   </div>
   <script src="{{ url_for('static', filename='scripts/post.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/article.js') }}"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
 </body>
 </html>

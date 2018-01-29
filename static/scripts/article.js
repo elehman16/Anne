@@ -38,6 +38,10 @@ function isAlreadyHighlighted(highlighted) {
 function add() {
     var highlighted = getSelectedText();
 
+    if (highlighted === "") {
+      return ;
+    }
+
     if (isAlreadyHighlighted(highlighted) === true) {
         $("#warning").append("<p>Text has already been selected.</p>")
         return;
@@ -45,6 +49,8 @@ function add() {
 
     $("#selected").append("<li>" + highlighted + "</li>");
     $("#warning").empty();
+    document.getElementById("submit-but").disabled = false;
+
 }
 
 /**
@@ -78,23 +84,77 @@ function submit() {
     var annotations = getFinalText();
     var selection = getCheckBoxSelection();
 
-    if (annotations.length > 0 || selection == 'Cannot tell based on the abstract') {
+    if (selection === 'Invalid prompt') {
+        $("#myModal").modal('show');
+    } else if (annotations.length > 0 || selection === 'Cannot tell based on the abstract') {
         post("/submit/", {"userid": userid, "id": id,
                           "annotations": JSON.stringify(annotations),
                           "selection": selection});
     }
+}
+
+/**
+* After getting a response, the user will press a button which will save their response.
+*/
+function submit_invalid_prompt() {
+  var userid = document.getElementById("userid").innerHTML;
+  var id = document.getElementById("id").innerHTML;
+  var text = document.getElementById("response").value;
+
+  if (text !== '') {
+    post("/submit/", {"userid": userid, "id": id,
+                      "annotations": JSON.stringify([text]),
+                      "selection": "Invalid prompt"});
+  }
 
 }
 
 /**
-* Clear all input
+* Enable the submit button iff there is selected-text or the user cannot tell
+* based on the abstract.
+*/
+function list_change() {
+  var selection = getCheckBoxSelection();
+  if (selection === 'Cannot tell based on the abstract' || selection === 'Invalid prompt') {
+    document.getElementById("submit-but").disabled = false;
+  } else if (getFinalText().length === 0) {
+    document.getElementById("submit-but").disabled = true;
+  }
+}
+
+/**
+* Clear all input and disable the submit button.
 */
 function clear() {
+    var selection = getCheckBoxSelection();
+    if (selection !== 'Cannot tell based on the abstract' || selection === 'Invalid prompt') {
+      document.getElementById("submit-but").disabled = true;
+    }
+
     $("#selected").empty();
     $("#warning").empty();
     $("#warning").hide();
 }
 
+
+/**
+* Disable the submit button unless they've typed something.
+*/
+function must_type_invalid_prompt() {
+    if (document.getElementById("response").value.length > 0) {
+      document.getElementById("invalid-submit-but").disabled = false;
+    } else {
+      document.getElementById("invalid-submit-but").disabled = true;
+    }
+}
+
 $("#add-but").click(add);
 $("#submit-but").click(submit);
 $("#restart-but").click(clear);
+$("#invalid-submit-but").click(submit_invalid_prompt);
+document.getElementById('checkbox-list').onchange = list_change;
+
+var response = document.getElementById('response');
+if (response !== null) {
+  response.addEventListener("keyup", must_type_invalid_prompt);
+}

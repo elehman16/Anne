@@ -47,10 +47,19 @@ function add() {
         return;
     }
 
+    // store the data in the corresponding box
     $("#selected").append("<li>" + highlighted + "</li>");
     $("#warning").empty();
-    document.getElementById("submit-but").disabled = false;
 
+    // disable the add-text button, and enable the clear button
+    document.getElementById("add-but").disabled = true;
+    document.getElementById("restart-but").disabled = false;
+
+    // only enable the submit button if the user has selected a dragdown.
+    var selection = getCheckBoxSelection();
+    if (selection !== "") {
+      document.getElementById("submit-but").disabled = false;
+    }
 }
 
 /**
@@ -83,13 +92,22 @@ function submit() {
     var id = document.getElementById("id").innerHTML;
     var annotations = getFinalText();
     var selection = getCheckBoxSelection();
+    var outcome = document.getElementById("outcome_save").innerHTML;
+    var comparator = document.getElementById("comparator_save").innerHTML;
+    var intervention = document.getElementById("intervention_save").innerHTML;
+    var xml_file = document.getElementById("xml_file").innerHTML;
 
     if (selection === 'Invalid prompt') {
         $("#myModal").modal('show');
     } else if (annotations.length > 0 || selection === 'Cannot tell based on the abstract') {
-        post("/submit/", {"userid": userid, "id": id,
+        post("/submit/", {"userid": userid,
+                          "id": id,
                           "annotations": JSON.stringify(annotations),
-                          "selection": selection});
+                          "selection": selection,
+                          "outcome": outcome,
+                          "comparator": comparator,
+                          "intervention": intervention,
+                          "xml_file": xml_file});
     }
 }
 
@@ -119,6 +137,8 @@ function list_change() {
     document.getElementById("submit-but").disabled = false;
   } else if (getFinalText().length === 0) {
     document.getElementById("submit-but").disabled = true;
+  } else {
+    document.getElementById("submit-but").disabled = false;
   }
 }
 
@@ -130,6 +150,8 @@ function clear() {
     if (selection !== 'Cannot tell based on the abstract' || selection === 'Invalid prompt') {
       document.getElementById("submit-but").disabled = true;
     }
+
+    document.getElementById("restart-but").disabled = true;
 
     $("#selected").empty();
     $("#warning").empty();
@@ -148,11 +170,61 @@ function must_type_invalid_prompt() {
     }
 }
 
+/**
+* When the user moves mouse onto this button, change the color.
+*/
+function hover_over(item) {
+  item.style.background = "#ccc";
+}
+
+/**
+* When the user moves mouse away from this button, change the color.
+*/
+function hover_away(item) {
+   var names = item.className;
+   if (names.includes('active')) {
+     return ;
+   }
+
+   item.style.background = "#f1f1f1";
+}
+
+/**
+* Gets the highlighted text without removing the selection.
+*/
+function get_Highlight_Text_No_Remove() {
+  var text = "";
+  if (window.getSelection) {
+      text = window.getSelection().toString();
+  } else if (document.selection && document.selection.type != "Control") {
+      text = document.selection.createRange().text;
+  }
+
+  text = text.trim();
+  return text;
+}
+
+/**
+* Disable/enable the add button iff text is selected.
+*/
+function addButtonAvail() {
+  var highlighted = get_Highlight_Text_No_Remove();
+
+  if (highlighted === "") {
+    document.getElementById("add-but").disabled = true;
+  } else {
+    document.getElementById("add-but").disabled = false;
+  }
+}
+
+
 $("#add-but").click(add);
 $("#submit-but").click(submit);
 $("#restart-but").click(clear);
 $("#invalid-submit-but").click(submit_invalid_prompt);
-document.getElementById('checkbox-list').onchange = list_change;
+document.getElementById('checkbox-list').onchange = list_change; // so we know when the user uses the dropdown
+document.getElementById('link_Abstract').click();
+document.onmouseup = addButtonAvail; // call this function whenever the person lifts up his or her mouse
 
 var response = document.getElementById('response');
 if (response !== null) {

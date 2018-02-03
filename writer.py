@@ -1,7 +1,9 @@
 import abc
 import json
 import csv
-
+from pathlib import Path
+import pandas as pd
+import numpy as np
 
 class Writer(object, metaclass=abc.ABCMeta):
     """Write annotation information.
@@ -38,14 +40,61 @@ class CSVWriter(Writer):
         self.write_file = write_file
 
     def submit_annotation(self, data):
-        with open(r'out.csv', 'a') as f:
+        row_heading = ['user_id', 'pmid_id', 'selection', 
+                       'annotation', 'outcome', 'comparator', 
+                       'intervention', 'invalid prompt', 'prompt reason']
+                       
+        path = './/all_outputs//out_{}.csv'.format(data['userid'])
+        data = self.__finish_data__(data) 
+        my_file = Path(path)
+        not_file = not(my_file.is_file())
+        with open(r'' + path, 'a') as f:
             writer = csv.writer(f)
-            writer.writerow(data)
+            if (not_file):
+                writer.writerow(row_heading)
+            writer.writerow(data)        
+    
 
     def get_results(self):
         with open(self.write_file, 'r') as csvfile:
             lines = csvfile.readlines()
         return '<br><br>'.join(lines)
+        
+    """
+    Goal is to format the data into an array.
+    """
+    def __finish_data__(self, form):
+        annotations = eval(form['annotations'])
+        userid = form['userid'] 
+        id_ = form['id']
+        selection = form['selection']
+        outcome = form['outcome']
+        comparator = form['comparator']
+        intervention = form['intervention']
+        invalid_prompt = 0
+        prompt_reason = ""
+        
+        
+        annotation_str = ''
+        for i in range(len(annotations)): # parse the data, join each sentence with a ","
+            annotation_str += annotations[i]
+            if (i != (len(annotations) - 1)):
+                annotation_str += ","     
+        
+            ['user_id', 'pmid_id', 'selection', 
+            'annotation', 'outcome', 'comparator', 
+            'intervention', 'invalid prompt', 'prompt reason']
+        if (selection == ""):
+            prompt_reason = annotation_str
+            annotation_str = ""
+            invalid_prompt = 1
+            
+        save_data = [userid, id_, selection, annotation_str, outcome, 
+                     comparator, intervention, invalid_prompt, prompt_reason]
+                
+        
+        return save_data
+        
 
 
 class SQLiteWriter(Writer):

@@ -46,14 +46,6 @@ body {font-family: Arial;}
     border-top: none;
 }
 
-.invalid_prompt_text {
-  width: 570px;
-  max-width: 570px;
-  height: 300px;
-  max-height: 300px;
-  overflow: auto;
-  resize: none;
-}
 </style>
 </head>
 <body>
@@ -87,6 +79,7 @@ body {font-family: Arial;}
         for (i = 0; i < tabcontent.length; i++) {
             tabcontent[i].style.display = "none";
         }
+
         tablinks = document.getElementsByClassName("tablinks");
         for (i = 0; i < tablinks.length; i++) {
             tablinks[i].className = tablinks[i].className.replace(" active", "");
@@ -180,7 +173,6 @@ body {font-family: Arial;}
                     <option> {{ option }} </option>
                 {% endfor %}
 
-                    <option> Invalid prompt </option>
               </select>
             </div>
         {% endif %}
@@ -201,8 +193,8 @@ body {font-family: Arial;}
           <!-- Panel heading (aka title) -->
           <div class="panel-heading">
             <label> Support for Decision: </label>
-            <button type="button" id= "add-but" class="btn btn-default" style = "margin-left: 195px;"> Add Text </button>
-            <button type="button" id= "restart-but" class="btn btn-default" style = "margin-left: 5px;"> Clear </button>
+            <button type="button" id= "add-but" class="btn btn-default" style = "margin-left: 195px;" disabled> Add Text </button>
+            <button type="button" id= "restart-but" class="btn btn-default" style = "margin-left: 5px;" disabled> Clear </button>
           </div>
 
           <!-- Scrollable window where selected-text is displayed -->
@@ -216,31 +208,20 @@ body {font-family: Arial;}
 
     </div>
 
-  <!-- Modal -->
-  <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
-    <div class="modal-dialog">
-
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <h5> <b> Please explain your reasoning below: </b> </h5>
-        </div>
-        <div class="modal-body">
-          <textarea id = "response" class = "invalid_prompt_text"> </textarea>
-        </div>
-        <div class="modal-footer">
-          <button id = "invalid-submit-but" type="button" class="btn btn-success" disabled> Submit </button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
   <div id="store">
       <p id="userid">{{ userid }}</p>
       <p id="id">{{ id }}</p>
   </div>
+
+  <script>
+    tablinks = document.getElementsByClassName("tablinks"); // get all the tab headers
+    if (tablinks.length > 2) { // if we have more than 2 tabs, move to the next section
+      tablinks[2].click();
+    } else { // otherwise, just open the first tab.
+      tablinks[0].click();
+    }
+
+  </script>
   <script src="{{ url_for('static', filename='scripts/post.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/article.js') }}"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>

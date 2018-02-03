@@ -197,7 +197,7 @@ class XMLReader(Reader):
     Initialize the article to have the proper fields and extra information.
     """
     def _init_article_(self, next_file, article_meta, body):
-        id_ = self._get_ids(article_meta) 
+        id_ = self._get_ids(article_meta)
         title = self._get_title(article_meta)   
         try:
             abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8') 
@@ -223,7 +223,7 @@ class XMLReader(Reader):
         art.get_extra()['comparator'] = sp_file_data['intervention2']
         art.get_extra()['intervention'] = sp_file_data['intervention1']
         
-        text.insert(0, ["Title", [['Article Title', title], 
+        text.insert(1, ["Title", [['Article Title', title], 
                                   ['PubMed Id', sp_file_data['pmid']]]])
         
         # only get the abstract if the next_file is None or it doesn't exist

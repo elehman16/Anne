@@ -6,6 +6,7 @@ import article
 import config
 import reader
 import writer
+import numpy as np
 
 global last_path
 application = flask.Flask(__name__)
@@ -13,6 +14,7 @@ application = flask.Flask(__name__)
 anne = annotator.Annotator(reader.get_reader(config.reader)(**config.reader_params),
                            writer.get_writer(config.writer)(**config.writer_params))
 
+valid_users = np.loadtxt('usernames.txt', delimiter = ',', dtype = 'str')
 
 """
 Display the main page.
@@ -27,8 +29,8 @@ Start the program.
 @application.route('/start/', methods=['GET', 'POST'])
 def start():
     userid = flask.request.form['userid']
-    if (userid is None or userid == ''):
-        userid = 'anon'
+    if not(userid in valid_users):
+        return flask.render_template('index.html')
     return flask.redirect(flask.url_for('annotate_abstract', userid=userid, 
                                                 id_ = anne.get_next_file()))
 
@@ -49,8 +51,9 @@ def annotate_abstract(userid, id_ = None):
         last_path = art.get_extra()['path']
         return flask.render_template('article.html',
                                      userid = userid,
-                                     id_ = art.id_,
+                                     id = art.id_,
                                      tabs = art.text,
+                                     xml_file = last_path,
                                      outcome = art.get_extra()['outcome'],
                                      intervention = art.get_extra()['intervention'],
                                      comparator = art.get_extra()['comparator'],
@@ -84,10 +87,12 @@ def annotate_full(userid, id_ = None):
     if not art:
         return flask.redirect(flask.url_for('finish'))
     else:
+        global last_path
         return flask.render_template('full_article.html',
                                      userid = userid,
-                                     id_ = art.id_,
+                                     id = art.id_,
                                      tabs = art.text,
+                                     xml_file = last_path,
                                      outcome = art.get_extra()['outcome'],
                                      intervention = art.get_extra()['intervention'],
                                      comparator = art.get_extra()['comparator'],
@@ -99,27 +104,17 @@ Submits the article id with all annotations.
 """
 @application.route('/submit/', methods=['POST'])
 def submit(): 
-    # grab all the info we want to save from javascript code
-    userid = flask.request.form['userid']
-    id_ = flask.request.form['id']
     selected = flask.request.form['selection']
-    annotations = eval(flask.request.form['annotations'])
-    
-    # put all annotations into a string and then use , as a delimiter
-    annotation_str = ''
-    for i in range(len(annotations)):
-        annotation_str += annotations[i]
-        if (i != (len(annotations) - 1)):
-            annotation_str += ","                 
-    
-    anne.submit_annotation([id_, selected, annotation_str])
-                  
+    userid = flask.request.form['userid']
+    anne.submit_annotation(flask.request.form)
+
     # if the person can't tell just based off the abstract
     if (selected == 'Cannot tell based on the abstract'):
         global last_path
         return flask.redirect(flask.url_for('annotate_full', 
                                             userid=userid,
                                             id_= last_path))
+                                            
     elif (selected == ''): # if they haven't selected anything, do nothing
         return None
     else: # otherwise go to the next abstract

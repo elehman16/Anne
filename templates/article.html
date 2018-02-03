@@ -2,23 +2,30 @@
 <html>
 <head>
   <head>
-      <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-      <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
-      <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/main.css') }}">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
   </head>
 <style>
 body {font-family: Arial;}
 
+
+.invalid_prompt_text {
+  width: 570px;
+  max-width: 570px;
+  height: 300px;
+  max-height: 300px;
+  overflow: auto;
+  resize: none;
+}
+
 /* Style the tab */
 .tab {
     overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
 }
 
 /* Style the buttons inside the tab */
 .tab button {
-    background-color: inherit;
     float: left;
     border: none;
     outline: none;
@@ -28,16 +35,6 @@ body {font-family: Arial;}
     font-size: 17px;
 }
 
-/* Change background color of buttons on hover */
-.tab button:hover {
-    background-color: #ddd;
-}
-
-/* Create an active/current tablink class */
-.tab button.active {
-    background-color: #ccc;
-}
-
 /* Style the tab content */
 .tabcontent {
     display: none;
@@ -45,6 +42,11 @@ body {font-family: Arial;}
     border: 1px solid #ccc;
     border-top: none;
 }
+
+.available {
+  background-color: #f1f1f1;
+}
+
 </style>
 </head>
 <body>
@@ -53,7 +55,15 @@ body {font-family: Arial;}
   <div style = "margin-bottom:10px;">
     <div class = "tab">
       {% for tab in tabs %}
-        <button id = 'link_{{ tab[0] }}' class="tablinks" onclick="openTab(event, '{{ tab[0] }}')">{{ tab[0] }}</button>
+        {% if tab[0] == 'Abstract' or tab[0] == 'Title'%}
+          <button id = 'link_{{ tab[0] }}' class="tablinks available" onmouseenter="hover_over(this)" onmouseleave="hover_away(this)"
+          onclick="openTab(event, '{{ tab[0] }}')">{{ tab[0] }}</button>
+        {% endif %}
+        {% if tab[0] != 'Abstract' and tab[0] != 'Title'%}
+          <button id = 'link_{{ tab[0] }}' style = "background-color:	#BEBEBE;" title="You must select 'Cannot tell based on abstract' to view additional tabs."
+           class="tablinks" disabled>{{ tab[0] }}</button>
+        {% endif %}
+
       {% endfor %}
 
     </div>
@@ -66,24 +76,6 @@ body {font-family: Arial;}
   </div>
 
   <hr>
-
-  <script>
-      var msg = "You cannot open this tab unless you submit that 'You cannot tell based on abstract'";
-      tablinks = document.getElementsByClassName("tablinks"); // get all tabs
-
-      // go through and disable all tabs
-      for (var i = 0; i < tablinks.length; i++) {
-
-        // Disable all tabs except the abstract, and put a message over it
-        if (tablinks[i].id !== 'link_Abstract' && tablinks[i].id !== 'link_Title') {
-          tablinks[i].disabled = true;
-          tablinks[i].title = msg;
-        } else {
-          tablinks[i].disabled = false;
-        }
-      }
-
-  </script>
 
   <script>
 
@@ -107,7 +99,17 @@ body {font-family: Arial;}
           tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
 
+        available_links = document.getElementsByClassName("available");
+        for (i = 0; i < tablinks.length; i++) {
+          if (available_links[i] !== undefined) {
+            available_links[i].style.background = "#f1f1f1";
+          }
+        }
+
+
         document.getElementById(name).style.display = "block";
+        document.getElementById(name).style.background = "";
+        document.getElementById("link_" + name).style.background = "#ccc";
         evt.currentTarget.className += " active";
     }
 
@@ -197,6 +199,7 @@ body {font-family: Arial;}
               {% endfor %}
 
                   <option> Cannot tell based on the abstract </option>
+                  <option> Invalid prompt </option>
             </select>
           </div>
       {% endif %}
@@ -216,9 +219,9 @@ body {font-family: Arial;}
       <div class="panel panel-default">
         <!-- Panel heading (aka title) -->
         <div class="panel-heading">
-          <label> Support for Decision: </label>
-          <button type="button" id= "add-but" class="btn btn-default" style = "margin-left: 195px;"> Add Text </button>
-          <button type="button" id= "restart-but" class="btn btn-default" style = "margin-left: 5px;"> Clear </button>
+          <label> Support for Decision </label>
+          <button type="button" id= "add-but" class="btn btn-default" style = "margin-left: 195px;" disabled> Add Text </button>
+          <button type="button" id= "restart-but" class="btn btn-default" style = "margin-left: 5px;" disabled> Clear </button>
         </div>
 
         <!-- Scrollable window where selected-text is displayed -->
@@ -232,13 +235,40 @@ body {font-family: Arial;}
 
   </div>
 
+  <!-- Modal -->
+  <div id="myModal" class="modal fade" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h5> <b> Please explain your reasoning below: </b> </h5>
+        </div>
+        <div class="modal-body">
+          <textarea id = "response" class = "invalid_prompt_text"> </textarea>
+        </div>
+        <div class="modal-footer">
+          <button id = "invalid-submit-but" type="button" class="btn btn-success" disabled> Submit </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 
   <div id="store">
       <p id="userid">{{ userid }}</p>
       <p id="id">{{ id }}</p>
+      <p id="outcome_save"> {{ outcome }} </p>
+      <p id="comparator_save"> {{ comparator }} </p>
+      <p id="intervention_save"> {{ intervention }} </p>
+      <p id="xml_file"> {{ xml_file }} </p>
   </div>
   <script src="{{ url_for('static', filename='scripts/post.js') }}"></script>
   <script src="{{ url_for('static', filename='scripts/article.js') }}"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
 </body>
 </html>

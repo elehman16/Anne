@@ -52,7 +52,7 @@ class CSVWriter(Writer):
             writer = csv.writer(f)
             if (not_file):
                 writer.writerow(row_heading)
-            writer.writerow(data)        
+            writer.writerow([str(x).encode('utf-8') for x in data])        
     
 
     def get_results(self):

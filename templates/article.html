@@ -9,7 +9,7 @@
 <style>
 body {font-family: Arial;}
 
-
+/* Style settings for the modal. */
 .invalid_prompt_text {
   width: 570px;
   max-width: 570px;
@@ -54,11 +54,14 @@ body {font-family: Arial;}
   <!-- Initialize the tab with titles . -->
   <div style = "margin-bottom:10px;">
     <div class = "tab">
+      <!-- Split the tabs between can view and cannot view -->
       {% for tab in tabs %}
         {% if tab[0] == 'Abstract' or tab[0] == 'Title'%}
           <button id = 'link_{{ tab[0] }}' class="tablinks available" onmouseenter="hover_over(this)" onmouseleave="hover_away(this)"
           onclick="openTab(event, '{{ tab[0] }}')">{{ tab[0] }}</button>
         {% endif %}
+
+        <!-- You can view these tabs -->
         {% if tab[0] != 'Abstract' and tab[0] != 'Title'%}
           <button id = 'link_{{ tab[0] }}' style = "background-color:	#BEBEBE;" title="You must select 'Cannot tell based on abstract' to view additional tabs."
            class="tablinks" disabled>{{ tab[0] }}</button>
@@ -107,6 +110,7 @@ body {font-family: Arial;}
         }
 
 
+        // change the coloring on the selected tab
         document.getElementById(name).style.display = "block";
         document.getElementById(name).style.background = "";
         document.getElementById("link_" + name).style.background = "#ccc";
@@ -190,6 +194,7 @@ body {font-family: Arial;}
           <div class="row warning" id="check-warning"> </div>
           <div class="row" id = "selections">
 
+            <!-- Establish radio buttons with the specified options from python code -->
             {% for option in options %}
             <div class="radio" >
               <label><input type="radio" id = "{{option}}" name="select" value = "{{option}}">
@@ -197,12 +202,15 @@ body {font-family: Arial;}
               </label>
             </div>
             {% endfor %}
+
+            <!-- Add in extra options that are specific to this display -->
             <div class="radio">
               <label><input type="radio" id = "cannot_tell" name="select" value = "Cannot tell based on the abstract">
                 Cannot tell based on the abstract
               </label>
             </div>
 
+            <!-- Add in extra options that are specific to this display -->
             <div class="radio">
               <label><input type="radio" id = "invalid_prompt" name="select" value = "Invalid Prompt">
                 Invalid Prompt
@@ -264,7 +272,7 @@ body {font-family: Arial;}
     </div>
   </div>
 
-
+  <!-- Storiing the data that will be used for later saving. -->
   <div id="store">
       <p id="userid">{{ userid }}</p>
       <p id="id">{{ id }}</p>
@@ -278,6 +286,7 @@ body {font-family: Arial;}
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
   <script>
+    // For all radio buttons, add in functionality.
     var opt = {{ options|tojson }};
     opt.push("cannot_tell");
     opt.push("invalid_prompt");

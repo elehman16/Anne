@@ -236,7 +236,7 @@ function addButtonAvail() {
   }
 }
 
-
+// add functions to the buttons
 $("#add-but").click(add);
 $("#submit-but").click(submit);
 $("#restart-but").click(clear);
@@ -244,5 +244,6 @@ $("#invalid-submit-but").click(submit_invalid_prompt);
 document.getElementById('link_Abstract').click();
 document.onmouseup = addButtonAvail; // call this function whenever the person lifts up his or her mouse
 
+// add functionality to the modal
 var response = document.getElementById('response');
 response.addEventListener("keyup", must_type_invalid_prompt);

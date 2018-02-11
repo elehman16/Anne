@@ -11,6 +11,7 @@ function getSelectedText() {
     } else if (document.selection && document.selection.type != "Control") {
         text = document.selection.createRange().text;
     }
+
     window.getSelection().removeAllRanges();
 
     text = text.trim();
@@ -29,6 +30,7 @@ function isAlreadyHighlighted(highlighted) {
             return true;
         }
     }
+
     return false;
 }
 
@@ -79,9 +81,17 @@ function getFinalText() {
 * i.e. "Significantly increased/decreased... etc."
 */
 function getCheckBoxSelection() {
-    var e = document.getElementById("checkbox-list");
-    var text = e.options[e.selectedIndex].text;
-    return text;
+  var selected = document.getElementsByName('select');
+  var ans = "";
+  for (var i = 0; i < selected.length; i++){
+    if (selected[i].checked) {
+        ans = selected[i].value;
+        break;
+    }
+  }
+
+
+  return ans;
 }
 
 /**
@@ -97,7 +107,7 @@ function submit() {
     var intervention = document.getElementById("intervention_save").innerHTML;
     var xml_file = document.getElementById("xml_file").innerHTML;
 
-    if (selection === 'Invalid prompt') {
+    if (selection === 'Invalid Prompt') {
         $("#myModal").modal('show');
     } else if (annotations.length > 0 || selection === 'Cannot tell based on the abstract') {
         post("/submit/", {"userid": userid,
@@ -118,11 +128,20 @@ function submit_invalid_prompt() {
   var userid = document.getElementById("userid").innerHTML;
   var id = document.getElementById("id").innerHTML;
   var text = document.getElementById("response").value;
+  var selection = getCheckBoxSelection();
+  var outcome = document.getElementById("outcome_save").innerHTML;
+  var comparator = document.getElementById("comparator_save").innerHTML;
+  var intervention = document.getElementById("intervention_save").innerHTML;
+  var xml_file = document.getElementById("xml_file").innerHTML;
 
   if (text !== '') {
     post("/submit/", {"userid": userid, "id": id,
                       "annotations": JSON.stringify([text]),
-                      "selection": "Invalid prompt"});
+                      "selection": selection,
+                      "outcome": outcome,
+                      "comparator": comparator,
+                      "intervention": intervention,
+                      "xml_file": xml_file});
   }
 
 }
@@ -133,7 +152,7 @@ function submit_invalid_prompt() {
 */
 function list_change() {
   var selection = getCheckBoxSelection();
-  if (selection === 'Cannot tell based on the abstract' || selection === 'Invalid prompt') {
+  if (selection === 'Cannot tell based on the abstract' || selection === 'Invalid Prompt') {
     document.getElementById("submit-but").disabled = false;
   } else if (getFinalText().length === 0) {
     document.getElementById("submit-but").disabled = true;
@@ -222,11 +241,8 @@ $("#add-but").click(add);
 $("#submit-but").click(submit);
 $("#restart-but").click(clear);
 $("#invalid-submit-but").click(submit_invalid_prompt);
-document.getElementById('checkbox-list').onchange = list_change; // so we know when the user uses the dropdown
 document.getElementById('link_Abstract').click();
 document.onmouseup = addButtonAvail; // call this function whenever the person lifts up his or her mouse
 
 var response = document.getElementById('response');
-if (response !== null) {
-  response.addEventListener("keyup", must_type_invalid_prompt);
-}
+response.addEventListener("keyup", must_type_invalid_prompt);

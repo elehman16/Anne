@@ -187,22 +187,30 @@ body {font-family: Arial;}
       <label style = "margin-left: -15px; font-size: 13px;">
         <i> Please fill out the following information based on the statement above: </i>
       </label>
-
-
-      {% if options %}
           <div class="row warning" id="check-warning"> </div>
-          <div class="row">
-            <select class="form-control" id="checkbox-list">
-              <option> </option>
-              {% for option in options %}
-                  <option> {{ option }} </option>
-              {% endfor %}
+          <div class="row" id = "selections">
 
-                  <option> Cannot tell based on the abstract </option>
-                  <option> Invalid prompt </option>
-            </select>
-          </div>
-      {% endif %}
+            {% for option in options %}
+            <div class="radio" >
+              <label><input type="radio" id = "{{option}}" name="select" value = "{{option}}">
+                {{ option }} ({{intervention}} vs. {{comparator}})
+              </label>
+            </div>
+            {% endfor %}
+            <div class="radio">
+              <label><input type="radio" id = "cannot_tell" name="select" value = "Cannot tell based on the abstract">
+                Cannot tell based on the abstract
+              </label>
+            </div>
+
+            <div class="radio">
+              <label><input type="radio" id = "invalid_prompt" name="select" value = "Invalid Prompt">
+                Invalid Prompt
+              </label>
+            </div>
+
+        </div>
+
 
       <!-- Green submit button that has a width to line up with the above drop down menu -->
       <button type="button" id= "submit-but" class="btn btn-success" style = "margin-left: -15px; margin-top: 10px; width: 440px;" disabled>
@@ -269,6 +277,15 @@ body {font-family: Arial;}
   <script src="{{ url_for('static', filename='scripts/article.js') }}"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
   <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <script>
+    var opt = {{ options|tojson }};
+    opt.push("cannot_tell");
+    opt.push("invalid_prompt");
+    for (var o = 0; o < opt.length; o++) {
+      option = opt[o];
+      document.getElementById(option).onclick = list_change; // so we know when the user uses the dropdown
+    }
+  </script>
 
 </body>
 </html>

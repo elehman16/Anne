@@ -8,7 +8,6 @@ function start() {
     } else {
       post("/start/", {"userid": id_})
     }
-
 }
 
 // So you can press enter and it will continue.

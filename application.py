@@ -30,9 +30,22 @@ Start the program.
 def start():
     userid = flask.request.form['userid']
     if not(userid in valid_users):
-        return flask.render_template('index.html')
-    return flask.redirect(flask.url_for('annotate_abstract', userid=userid, 
-                                                id_ = anne.get_next_file()))
+        return flask.render_template('index_invalid_user.html')
+    return flask.redirect(flask.url_for('annotate_abstract', 
+                                        userid=userid, 
+                                        id_ = anne.get_next_file()))
+                
+"""
+Start the program, but show the error to the user first.
+"""
+@application.route('/invalid_user/', methods=['GET', 'POST'])
+def invalid_user():
+    userid = flask.request.form['userid']
+    if not(userid in valid_users):
+        return flask.render_template('index_invalid_user.html', should_show = "true")
+    return flask.redirect(flask.url_for('annotate_abstract', 
+                                        userid=userid, 
+                                        id_ = anne.get_next_file()))
 
 """
 Display just the abstract.
@@ -58,21 +71,6 @@ def annotate_abstract(userid, id_ = None):
                                      intervention = art.get_extra()['intervention'],
                                      comparator = art.get_extra()['comparator'],
                                      options = config.options_full)
-
-"""
-Always grabs a random article and displays the full text.
-"""                            
-@application.route('/annotate/<userid>/', methods=['GET'])
-def annotate(userid):
-    art = anne.get_next_article()
-    if not art:
-        return flask.redirect(flask.url_for('finish'))
-    else:
-        return flask.render_template('article.html',
-                                 userid=userid,
-                                 id=art.id_,
-                                 title=art.title,
-                                 text=art.text)
 
 """
 Grabs a specified article and displays the full text.

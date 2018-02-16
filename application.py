@@ -52,10 +52,13 @@ Display just the abstract.
 """    
 @application.route('/annotate_abstract/<userid>/<id_>/', methods=['GET'])
 def annotate_abstract(userid, id_ = None):
-    if id_ is None:
-        art = anne.get_next_article()
-    else:
-        art = anne.get_next_article(id_)
+    try:
+        if id_ is None:
+            art = anne.get_next_article()
+        else:
+            art = anne.get_next_article(id_)
+    except:
+        return annotate_abstract(userid, id_)
     
     if not art:
         return flask.redirect(flask.url_for('finish'))
@@ -77,10 +80,13 @@ Grabs a specified article and displays the full text.
 """                             
 @application.route('/annotate_full/<userid>/<id_>/', methods=['GET'])
 def annotate_full(userid, id_ = None):
-    if id_ is None:
-        art = anne.get_next_article()
-    else:
-        art = anne.get_next_article(id_)
+    try:
+        if id_ is None:
+            art = anne.get_next_article()
+        else:
+            art = anne.get_next_article(id_)
+    except:
+        return annotate_abstract(userid, id_)
     
     if not art:
         return flask.redirect(flask.url_for('finish'))

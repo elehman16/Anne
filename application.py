@@ -58,8 +58,8 @@ def annotate_abstract(userid, id_ = None):
         else:
             art = anne.get_next_article(id_)
     except:
-        return annotate_abstract(userid, id_)
-    
+        return annotate_abstract(userid)
+   
     if not art:
         return flask.redirect(flask.url_for('finish'))
     else:

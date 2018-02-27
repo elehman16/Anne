@@ -202,10 +202,14 @@ class XMLReader(Reader):
         try:
             abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8') 
         except:
-            abstract_sections = self._get_sections(article_meta.find('abstract'))
-            abstract = []        
-            for part in abstract_sections:
-                abstract.append([part[0], part[1]])
+            temp = article_meta.find('abstract')
+            if (temp is None):
+                abstract = []
+            else:   
+                abstract_sections = self._get_sections(temp)
+                abstract = []        
+                for part in abstract_sections:
+                    abstract.append([part[0], part[1]])
                    
         if not(body is None):
             text = self._get_sections(body) #self._get_full_text(body)
@@ -243,6 +247,7 @@ class XMLReader(Reader):
 
         if not next_file:
             return None
+            
         path_to_file =  self.path + '/' + next_file # the path to XML files
         et = ET.parse(path_to_file) 
         root = et.getroot() 
@@ -251,11 +256,9 @@ class XMLReader(Reader):
         article_meta = front.find('article-meta')
         body = root.find('body')
        
-        try:
-            art = self._init_article_(next_file, article_meta, body)
-            return art
-        except:
-            return self.get_next_article()
+        art = self._init_article_(next_file, article_meta, body)
+        return art
+        
 
 """
 Builder pattern for readers.

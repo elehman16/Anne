@@ -17,12 +17,12 @@ def get_file_description():
     labels[0] = "id"
     for i in range(1, len(all_rows)):
         row = all_rows[i]
-        name = row[2] # the name of the PMC file
+        name = row[labels.index('pmid')] # the name of the PMC file
         if name in data:
             data[name].append(gen_row_dictionary(labels, row))
         else:
             data[name] = [gen_row_dictionary(labels, row)]
-            
+    
     return data
 
 """

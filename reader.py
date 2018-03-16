@@ -122,12 +122,12 @@ class XMLReader(Reader):
     def _get_next_file(self, user):
         user_progress = np.genfromtxt('.//data//user_progress.csv', delimiter = ",", dtype = str)
         user_progress = user_progress.reshape((int(user_progress.size / 2), 2))      
-        ordering = np.loadtxt('.//data//ordering_list.txt', dtype = int)
+        ordering = np.loadtxt('.//data//ordering_list.txt', dtype = float)
         i = 0
         for row in user_progress:
             row_val = int(float(row[1]))
             if (row[0] == user and len(ordering) > row_val):
-                return ordering[row_val]
+                return int(ordering[row_val])
             elif (row[0] == user and not(len(ordering) > row_val)):
                 return None
             i += 1
@@ -135,7 +135,7 @@ class XMLReader(Reader):
         user_progress = user_progress.tolist()
         user_progress.append([user, 0])
         np.savetxt('.//data//user_progress.csv', np.asarray(user_progress), delimiter = ",", fmt = "%s")
-        return ordering[0]
+        return int(ordering[0])
         
     """
     Given the path that leads to a folder of ONLY XML files, the function

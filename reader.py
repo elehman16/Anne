@@ -125,9 +125,10 @@ class XMLReader(Reader):
         ordering = np.loadtxt('.//data//ordering_list.txt', dtype = int)
         i = 0
         for row in user_progress:
-            if (row[0] == user and len(ordering) > int(row[1])):
-                return ordering[int(row[1])]
-            elif (row[0] == user and not(len(ordering) > int(row[1]))):
+            row_val = int(float(row[1]))
+            if (row[0] == user and len(ordering) > row_val):
+                return ordering[row_val]
+            elif (row[0] == user and not(len(ordering) > row_val)):
                 return None
             i += 1
            

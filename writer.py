@@ -43,7 +43,8 @@ class CSVWriter(Writer):
         row_heading = ['user_id', 'pmid_id', 'selection', 
                        'annotation', 'outcome', 'comparator', 
                        'intervention', 'invalid prompt', 'prompt reason']
-                       
+        if (data['selection'] != 'Cannot tell based on the abstract'):
+            self.update_user_progress(data['userid'])                       
         path = './/all_outputs//out_{}.csv'.format(data['userid'])
         data = self.__finish_data__(data) 
         my_file = Path(path)
@@ -52,7 +53,28 @@ class CSVWriter(Writer):
             writer = csv.writer(f)
             if (not_file):
                 writer.writerow(row_heading)
-            writer.writerow([str(x).encode('utf-8') for x in data])        
+            writer.writerow([str(x).encode('utf-8') for x in data])       
+        
+        
+
+        return None
+       
+    """
+    Call this method when the user has finished annotating something.
+    """
+    def update_user_progress(self, user):
+        user_progress = np.genfromtxt('.//data//user_progress.csv', delimiter = ",", dtype = str)
+        user_progress = user_progress.reshape((int(user_progress.size / 2), 2))              
+        i = 0
+        for row in user_progress:
+            if (row[0] == user):
+                user_progress[i][1] = str(int(user_progress[i][1]) + 1)
+                np.savetxt('.//data//user_progress.csv', user_progress, delimiter = ",", fmt = "%s")
+                break
+            i += 1
+           
+        
+        return None
     
 
     def get_results(self):

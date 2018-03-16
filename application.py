@@ -31,9 +31,14 @@ def start():
     userid = flask.request.form['userid']
     if not(userid in valid_users):
         return flask.render_template('index_invalid_user.html')
-    return flask.redirect(flask.url_for('annotate_abstract', 
-                                        userid=userid, 
-                                        id_ = anne.get_next_file()))
+        
+    id_ = anne.get_next_file(userid)
+    if not id_:
+        return flask.redirect(flask.url_for('finish'))
+    else:
+        return flask.redirect(flask.url_for('annotate_abstract', 
+                                            userid = userid, 
+                                            id_ = id_))
                 
 """
 Start the program, but show the error to the user first.
@@ -43,22 +48,25 @@ def invalid_user():
     userid = flask.request.form['userid']
     if not(userid in valid_users):
         return flask.render_template('index_invalid_user.html', should_show = "true")
-    return flask.redirect(flask.url_for('annotate_abstract', 
-                                        userid=userid, 
-                                        id_ = anne.get_next_file()))
+    
+    id_ = anne.get_next_file(userid)
+    if not id_:
+        return flask.redirect(flask.url_for('finish'))
+    else:
+        return flask.redirect(flask.url_for('annotate_abstract', 
+                                            userid = userid, 
+                                            id_ = id_))
 
 """
 Display just the abstract.
 """    
 @application.route('/annotate_abstract/<userid>/<id_>/', methods=['GET'])
 def annotate_abstract(userid, id_ = None):
-    try:
-        if id_ is None:
-            art = anne.get_next_article()
-        else:
-            art = anne.get_next_article(id_)
-    except:
-        return annotate_abstract(userid)
+    if id_ is None:
+        art = anne.get_next_article(userid)
+    else:
+        art = anne.get_next_article(userid, id_)
+    
    
     if not art:
         return flask.redirect(flask.url_for('finish'))
@@ -82,9 +90,9 @@ Grabs a specified article and displays the full text.
 def annotate_full(userid, id_ = None):
     try:
         if id_ is None:
-            art = anne.get_next_article()
+            art = anne.get_next_article(userid)
         else:
-            art = anne.get_next_article(id_)
+            art = anne.get_next_article(userid, id_)
     except:
         return annotate_abstract(userid, id_)
     
@@ -121,10 +129,14 @@ def submit():
                                             
     elif (selected == ''): # if they haven't selected anything, do nothing
         return None
-    else: # otherwise go to the next abstract
+    # otherwise go to the next abstract
+    id_ = anne.get_next_file(userid)
+    if not id_:
+        return flask.redirect(flask.url_for('finish'))
+    else:
         return flask.redirect(flask.url_for('annotate_abstract', 
                                             userid=userid,
-                                            id_ = anne.get_next_file()))
+                                            id_ = id_))
 
 """
 Only go to this if there are no more articles to be annotated.

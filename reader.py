@@ -4,7 +4,9 @@ import os
 import random
 import sqlite3
 import xml.etree.ElementTree as ET
+import pandas as pd
 from get_file_description import get_file_description
+from data.by_row_description import by_row_description
 import numpy as np
 
 import article
@@ -111,12 +113,34 @@ class XMLReader(Reader):
     def __init__(self, path):
         self.path = path
         self.file_description = get_file_description()
+        self.by_row_description = by_row_description()
 
     """
     Given the path that leads to a folder of ONLY XML files, the function
     will pick one and then return the name of it.
     """
-    def _get_next_file(self):
+    def _get_next_file(self, user):
+        user_progress = np.genfromtxt('.//data//user_progress.csv', delimiter = ",", dtype = str)
+        user_progress = user_progress.reshape((int(user_progress.size / 2), 2))      
+        ordering = np.loadtxt('.//data//ordering_list.txt', dtype = int)
+        i = 0
+        for row in user_progress:
+            if (row[0] == user and len(ordering) > int(row[1])):
+                return ordering[int(row[1])]
+            elif (row[0] == user and not(len(ordering) > int(row[1]))):
+                return None
+            i += 1
+           
+        user_progress = user_progress.tolist()
+        user_progress.append([user, 0])
+        np.savetxt('.//data//user_progress.csv', np.asarray(user_progress), delimiter = ",", fmt = "%s")
+        return ordering[0]
+        
+    """
+    Given the path that leads to a folder of ONLY XML files, the function
+    will pick one and then return the name of it.
+    """
+    def _get_next_file_random(self):
         try:
             paths = os.listdir(self.path)
             if ('desktop.ini' in paths): # issue with internal works of windows
@@ -242,20 +266,21 @@ class XMLReader(Reader):
     If the next_file is not equal to 'None', then it will grab the full article.
     Otherwise, it will only display the abstract.
     """
-    def get_next_article(self, next_file=None):
-        next_file = next_file or self._get_next_file()
+    def get_next_article(self, user, next_file=None):
+        next_file = next_file or self._get_next_file(user)
 
         if not next_file:
             return None
             
-        path_to_file =  self.path + '/' + next_file # the path to XML files
+        pmc = self.by_row_description[int(next_file)][0]['XML_file_names']
+        path_to_file =  self.path + '/' + pmc # the path to XML files
         et = ET.parse(path_to_file) 
         root = et.getroot() 
         
         front = root.find('front')
         article_meta = front.find('article-meta')
         body = root.find('body')
-       
+
         art = self._init_article_(next_file, article_meta, body)
         return art
         

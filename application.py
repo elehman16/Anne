@@ -86,8 +86,8 @@ def annotate_abstract(userid, id_ = None):
 """
 Grabs a specified article and displays the full text.
 """                             
-@application.route('/annotate_full/<userid>/<id_>/', methods=['GET'])
-def annotate_full(userid, id_ = None):
+@application.route('/annotate_full/<userid>/<id_>/<outcome>/<intervention>/<comparator>/', methods=['GET'])
+def annotate_full(userid, outcome, intervention, comparator, id_ = None):
     try:
         if id_ is None:
             art = anne.get_next_article(userid)
@@ -105,9 +105,9 @@ def annotate_full(userid, id_ = None):
                                      id = art.id_,
                                      tabs = art.text,
                                      xml_file = last_path,
-                                     outcome = art.get_extra()['outcome'],
-                                     intervention = art.get_extra()['intervention'],
-                                     comparator = art.get_extra()['comparator'],
+                                     outcome = outcome,
+                                     intervention = intervention,
+                                     comparator = comparator,
                                      options = config.options_full)
                                  
 
@@ -118,13 +118,19 @@ Submits the article id with all annotations.
 def submit(): 
     selected = flask.request.form['selection']
     userid = flask.request.form['userid']
+    o = flask.request.form['outcome']
+    i = flask.request.form['intervention']
+    c = flask.request.form['comparator']
     anne.submit_annotation(flask.request.form)
 
     # if the person can't tell just based off the abstract
     if (selected == 'Cannot tell based on the abstract'):
         global last_path
         return flask.redirect(flask.url_for('annotate_full', 
-                                            userid=userid,
+                                            userid = userid,
+                                            outcome = o, 
+                                            intervention = i, 
+                                            comparator = c,
                                             id_= last_path))
                                             
     elif (selected == ''): # if they haven't selected anything, do nothing

@@ -8,6 +8,8 @@ import pandas as pd
 from get_file_description import get_file_description
 from data.by_row_description import by_row_description
 import numpy as np
+from functools import reduce
+
 
 import article
 
@@ -225,7 +227,10 @@ class XMLReader(Reader):
         id_ = self._get_ids(article_meta)
         title = self._get_title(article_meta)   
         try:
-            abstract = ET.tostring(article_meta.find('abstract').find('p')).decode('utf-8') 
+            lop = article_meta.find('abstract').findall('p')
+            abstract = reduce((lambda x, y: ''.join([x, ET.tostring(y).decode('utf-8')])), lop, "")        
+            if abstract == '':
+                abstract = ET.tostring(article_meta.find('abstract')).decode('utf-8')
         except:
             temp = article_meta.find('abstract')
             if (temp is None):

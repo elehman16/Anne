@@ -227,11 +227,6 @@ class XMLReader(Reader):
         id_ = self._get_ids(article_meta)
         title = self._get_title(article_meta)   
         try:
-            lop = article_meta.find('abstract').findall('p')
-            abstract = reduce((lambda x, y: ''.join([x, ET.tostring(y).decode('utf-8')])), lop, "")        
-            if abstract == '':
-                abstract = ET.tostring(article_meta.find('abstract')).decode('utf-8')
-        except:
             temp = article_meta.find('abstract')
             if (temp is None):
                 abstract = []
@@ -240,6 +235,12 @@ class XMLReader(Reader):
                 abstract = []        
                 for part in abstract_sections:
                     abstract.append([part[0], part[1]])
+        except:
+            lop = article_meta.find('abstract').findall('p')
+            abstract = reduce((lambda x, y: ''.join([x, ET.tostring(y).decode('utf-8')])), lop, "")        
+            if abstract == '':
+                abstract = ET.tostring(article_meta.find('abstract')).decode('utf-8')
+            
                    
         if not(body is None):
             text = self._get_sections(body) #self._get_full_text(body)

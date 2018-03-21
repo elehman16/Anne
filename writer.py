@@ -44,7 +44,8 @@ class CSVWriter(Writer):
                        'annotation', 'outcome', 'comparator', 
                        'intervention', 'invalid prompt', 'prompt reason']
         if (data['selection'] != 'Cannot tell based on the abstract'):
-            self.update_user_progress(data['userid'])                       
+            self.update_user_progress(data['userid'])
+                               
         path = './/all_outputs//out_{}.csv'.format(data['userid'])
         data = self.__finish_data__(data) 
         my_file = Path(path)
@@ -60,7 +61,8 @@ class CSVWriter(Writer):
         return None
        
     """
-    Call this method when the user has finished annotating something.
+    Call this method when the user has finished annotating something. This 
+    incriments the persons progress on work!
     """
     def update_user_progress(self, user):
         user_progress = np.genfromtxt('.//data//user_progress.csv', delimiter = ",", dtype = str)
@@ -98,7 +100,8 @@ class CSVWriter(Writer):
         
         
         annotation_str = ''
-        for i in range(len(annotations)): # parse the data, join each sentence with a ","
+        # parse the data, join each sentence with a ","
+        for i in range(len(annotations)): 
             annotation_str += annotations[i]
             if (i != (len(annotations) - 1)):
                 annotation_str += ","     
@@ -106,7 +109,8 @@ class CSVWriter(Writer):
             ['user_id', 'pmid_id', 'selection', 
             'annotation', 'outcome', 'comparator', 
             'intervention', 'invalid prompt', 'prompt reason']
-        if (selection == ""):
+            
+        if (selection == "Invalid Prompt"):
             prompt_reason = annotation_str
             annotation_str = ""
             invalid_prompt = 1

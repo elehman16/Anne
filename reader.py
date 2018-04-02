@@ -252,11 +252,15 @@ class XMLReader(Reader):
         art.get_extra()['path'] = next_file
                 
         file_data = self.file_description[int(id_)]
-        sp_file_data = file_data[np.random.randint(len(file_data))] # get any random comparator
+        sp_file_data = None
+        for row in file_data:
+            if (row['Unnamed: 0'] == int(next_file)):
+                sp_file_data = row
+                
         art.get_extra()['outcome'] = sp_file_data['outcome_name']
         art.get_extra()['comparator'] = sp_file_data['intervention2']
         art.get_extra()['intervention'] = sp_file_data['intervention1']
-        
+                
         text.insert(1, ["Title", [['Article Title', title], 
                                   ['PubMed Id', sp_file_data['pmid']]]])
         

@@ -162,7 +162,7 @@ class XMLReader(Reader):
         ids = article_meta.findall('article-id')
         id_ = None # the number associated with the xml
         for id in ids:
-            if 'pub-id-type' in id.attrib and id.attrib['pub-id-type'] == 'pmid':
+            if 'pub-id-type' in id.attrib and id.attrib['pub-id-type'].lower() == 'pmc':
                 id_ = id.text
         
         return id_
@@ -257,12 +257,12 @@ class XMLReader(Reader):
             if (row['Unnamed: 0'] == int(next_file)):
                 sp_file_data = row
                 
-        art.get_extra()['outcome'] = sp_file_data['outcome_name']
-        art.get_extra()['comparator'] = sp_file_data['intervention2']
-        art.get_extra()['intervention'] = sp_file_data['intervention1']
+        art.get_extra()['outcome'] = sp_file_data['Outcome']
+        art.get_extra()['comparator'] = sp_file_data['Comparator']
+        art.get_extra()['intervention'] = sp_file_data['Intervention']
                 
         text.insert(1, ["Title", [['Article Title', title], 
-                                  ['PubMed Id', sp_file_data['pmid']]]])
+                                  ['PMC id', sp_file_data['XML']]]])
         
         # only get the abstract if the next_file is None or it doesn't exist
         if (not(abstract is None) and not(next_file is None)):
@@ -282,8 +282,8 @@ class XMLReader(Reader):
         if not next_file:
             return None
             
-        pmc = self.by_row_description[int(next_file)][0]['XML_file_names']
-        path_to_file =  self.path + '/' + pmc # the path to XML files
+        pmc = self.by_row_description[int(next_file)][0]['XML']
+        path_to_file =  self.path + '//PMC' + str(pmc) + '.nxml' # the path to XML files
         et = ET.parse(path_to_file) 
         root = et.getroot() 
         

@@ -22,10 +22,13 @@ def get_file_description():
     for i in range(1, len(all_rows)):
         data.append(all_rows[i][0])
     return data
-
+"""
 data = get_file_description()
+"""
+
+data = list(range(2, 99))
 random.shuffle(data)
-data = data[:20]
+#data = data[:20]
 np.savetxt('ordering_list.txt', data, delimiter = " ")
 
 

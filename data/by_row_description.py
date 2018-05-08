@@ -14,7 +14,7 @@ def by_row_description():
     all_rows = np.asarray(all_rows)
     
     labels = get_labels()
-    labels[0] = "id"
+    #labels[0] = "id"
     for i in range(1, len(all_rows)):
         row = all_rows[i]
         name = row[labels.index('Unnamed: 0')] # the name of the PMC file
@@ -26,7 +26,9 @@ def by_row_description():
     return data
     
 
-csv_file_loc = './/data//for-full-text-annotation.csv'
+#csv_file_loc = './/data//for-full-text-annotation.csv'
+csv_file_loc = './/data//prompt_gen.csv'
+
 
 """
 Read in the CSV file and get the required data from it. Format the data.

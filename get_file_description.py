@@ -3,7 +3,8 @@ import numpy as np
 import csv
 
 
-csv_file_loc = './/data//for-full-text-annotation.csv'
+#csv_file_loc = './/data//for-full-text-annotation.csv'
+csv_file_loc = './/data//prompt_gen.csv'
 
 """
 Read in the CSV file and get the required data from it. Format the data.
@@ -14,10 +15,9 @@ def get_file_description():
     all_rows = np.asarray(all_rows)
     
     labels = get_labels()
-    labels[0] = "id"
     for i in range(1, len(all_rows)):
         row = all_rows[i]
-        name = row[labels.index('pmid')] # the name of the PMC file
+        name = row[labels.index('XML')] # the name of the PMC file
         if name in data:
             data[name].append(gen_row_dictionary(labels, row))
         else:
@@ -31,9 +31,7 @@ Get the lables/headers for each column.
 def get_labels():
     with open(csv_file_loc, newline = '') as csvfile:
         for row in csv.reader(csvfile, delimiter = ",", quotechar='|'):
-            return row
-        
-        
+            return row    
     
 """
 Take a row and put all the data into a dictionary.
@@ -47,4 +45,3 @@ def gen_row_dictionary(labels, row):
         data[labels[i]] = row[i]
     return data
     
-get_file_description()

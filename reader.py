@@ -122,8 +122,14 @@ class XMLReader(Reader):
     """
     def _get_next_file(self, user):
         user_progress = np.genfromtxt('.//data//user_progress.csv', delimiter = ",", dtype = str)
-        user_progress = user_progress.reshape((int(user_progress.size / 2), 2))      
-        ordering = np.loadtxt('.//data//ordering_list.txt', dtype = float)
+        user_progress = user_progress.reshape((int(user_progress.size / 2), 2))
+        
+        # allow users to have their own list to work on, versus, a group-shared list.
+        try:
+            ordering = np.loadtxt('.//data//ordering_list_' + user + '.txt', dtype = float)
+        except:
+            ordering = np.loadtxt('.//data//ordering_list.txt', dtype = float)
+            
         i = 0
         for row in user_progress:
             row_val = int(float(row[1]))

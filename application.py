@@ -162,4 +162,4 @@ def results():
 Run the application.
 """
 if __name__ == '__main__':
-    application.run(host = '0.0.0.0', port = 8081) #application.run()
+    application.run(host = '0.0.0.0', port = 8081) 

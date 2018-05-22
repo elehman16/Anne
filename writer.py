@@ -50,13 +50,11 @@ class CSVWriter(Writer):
         data = self.__finish_data__(data) 
         my_file = Path(path)
         not_file = not(my_file.is_file())
-        with open(r'' + path, 'a') as f:
+        with open(r'' + path, 'a', newline = '', encoding = 'utf-8') as f:
             writer = csv.writer(f)
             if (not_file):
                 writer.writerow(row_heading)
-            writer.writerow([str(x).encode('utf-8') for x in data])       
-        
-        
+            writer.writerow([str(x) for x in data])               
 
         return None
        

@@ -107,6 +107,21 @@ function submit() {
     var intervention = document.getElementById("intervention_save").innerHTML;
     var xml_file = document.getElementById("xml_file").innerHTML;
 
+    // Modify the necessary annotations to include the whole table.
+    for (var j = 0; j < annotations.length; j++) {
+    // Determine if this is in a table.
+      var trs = document.getElementsByTagName("tr");
+      var text = annotations[j];
+      for (var i = 0; i < trs.length; i++) {
+        var tr = trs[i];
+        var txt = tr.innerText;
+        // Check if either are a substring of another -> if so, save it.
+        if (text.indexOf(txt) != -1 || txt.indexOf(text) != -1) {
+          annotations[j] = tr.innerHTML;
+        }
+      }
+    }
+
     if (selection === 'Invalid Prompt') {
         $("#myModal").modal('show');
     } else if (annotations.length > 0 || selection === 'Cannot tell based on the abstract') {

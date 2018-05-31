@@ -26,9 +26,13 @@ def get_file_description():
 data = get_file_description()
 """
 
-data = list(range(2, 99))
+data = list(range(99, 214))
 random.shuffle(data)
 #data = data[:20]
-np.savetxt('ordering_list.txt', data, delimiter = " ")
+names = ['edin', 'milorad', 'lidija']
+for n in names:
+    f = open('ordering_list_' + n + '.txt','ab')
+    np.savetxt(f, data, delimiter = " ")
+    f.close()
 
 

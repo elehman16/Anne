@@ -8,7 +8,6 @@ import reader
 import writer
 import numpy as np
 
-global last_path
 application = flask.Flask(__name__)
 
 anne = annotator.Annotator(reader.get_reader(config.reader)(**config.reader_params),
@@ -71,13 +70,12 @@ def annotate_abstract(userid, id_ = None):
     if not art:
         return flask.redirect(flask.url_for('finish'))
     else:
-        global last_path
-        last_path = art.get_extra()['path']
+        save_last_path(userid, art.get_extra()['path'])
         return flask.render_template('article.html',
                                      userid = userid,
                                      id = art.id_,
                                      tabs = art.text,
-                                     xml_file = last_path,
+                                     xml_file = art.get_extra()['path'],
                                      outcome = art.get_extra()['outcome'],
                                      intervention = art.get_extra()['intervention'],
                                      comparator = art.get_extra()['comparator'],
@@ -99,12 +97,11 @@ def annotate_full(userid, outcome, intervention, comparator, id_ = None):
     if not art:
         return flask.redirect(flask.url_for('finish'))
     else:
-        global last_path
         return flask.render_template('full_article.html',
                                      userid = userid,
                                      id = art.id_,
                                      tabs = art.text,
-                                     xml_file = last_path,
+                                     xml_file = get_last_path(userid),
                                      outcome = outcome,
                                      intervention = intervention,
                                      comparator = comparator,
@@ -125,13 +122,12 @@ def submit():
 
     # if the person can't tell just based off the abstract
     if (selected == 'Cannot tell based on the abstract'):
-        global last_path
         return flask.redirect(flask.url_for('annotate_full', 
                                             userid = userid,
                                             outcome = o, 
                                             intervention = i, 
                                             comparator = c,
-                                            id_= last_path))
+                                            id_= get_last_path(userid)))
                                             
     elif (selected == ''): # if they haven't selected anything, do nothing
         return None
@@ -157,10 +153,20 @@ Call the get results funciton.
 @application.route('/results/', methods=['GET'])
 def results():
     return anne.get_results()
+    
+"""
+Get the last path.
+"""
+def get_last_path(user):
+    txt = np.genfromtxt(user + "_progress.txt", delimiter = ' ')
+    return str(int(txt + 0))
+    
+def save_last_path(user, path):
+    np.savetxt(user + "_progress.txt", [int(path)], delimiter = ' ',  fmt = '%.18e')
 
 """
 Run the application.
 """
 if __name__ == '__main__':
-    #application.run()
-    application.run(host = '0.0.0.0', port = 8081) 
+   #application.run()
+   application.run(host = '0.0.0.0', port = 8081) 

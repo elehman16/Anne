@@ -115,18 +115,12 @@ Submits the article id with all annotations.
 def submit(): 
     selected = flask.request.form['selection']
     userid = flask.request.form['userid']
-    o = flask.request.form['outcome']
-    i = flask.request.form['intervention']
-    c = flask.request.form['comparator']
     anne.submit_annotation(flask.request.form)
 
     # if the person can't tell just based off the abstract
     if (selected == 'Cannot tell based on the abstract'):
         return flask.redirect(flask.url_for('annotate_full', 
                                             userid = userid,
-                                            outcome = o, 
-                                            intervention = i, 
-                                            comparator = c,
                                             id_= get_last_path(userid)))
                                             
     elif (selected == ''): # if they haven't selected anything, do nothing

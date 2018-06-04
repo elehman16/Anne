@@ -84,8 +84,8 @@ def annotate_abstract(userid, id_ = None):
 """
 Grabs a specified article and displays the full text.
 """                             
-@application.route('/annotate_full/<userid>/<id_>/<outcome>/<intervention>/<comparator>/', methods=['GET'])
-def annotate_full(userid, outcome, intervention, comparator, id_ = None):
+@application.route('/annotate_full/<userid>/<id_>/', methods=['GET'])
+def annotate_full(userid, id_ = None):
     try:
         if id_ is None:
             art = anne.get_next_article(userid)
@@ -102,9 +102,9 @@ def annotate_full(userid, outcome, intervention, comparator, id_ = None):
                                      id = art.id_,
                                      tabs = art.text,
                                      xml_file = get_last_path(userid),
-                                     outcome = outcome,
-                                     intervention = intervention,
-                                     comparator = comparator,
+                                     outcome = art.get_extra()['outcome'],
+                                     intervention = art.get_extra()['intervention'],
+                                     comparator = art.get_extra()['comparator'],
                                      options = config.options_full)
                                  
 

@@ -9,30 +9,26 @@ import random
 import pandas as pd
 import numpy as np
 
+st = 214
+end = 485
 
-csv_file_loc = 'for-full-text-annotation.csv'
-
-"""
-Read in the CSV file and get the required data from it. Format the data.
-"""
-def get_file_description():
-    all_rows = pd.read_csv(csv_file_loc)
-    all_rows = np.asarray(all_rows)
-    data = []
-    for i in range(1, len(all_rows)):
-        data.append(all_rows[i][0])
-    return data
-"""
-data = get_file_description()
-"""
-
-data = list(range(99, 214))
+data = list(range(st, end))
 random.shuffle(data)
-#data = data[:20]
+
 names = ['edin', 'milorad', 'lidija']
+new_data = []
+last = 0
+for i in range(len(names)):
+    next_one = min(end, int(last + (end - st) / len(names)))
+    new_data.append(data[last:next_one])
+    last = next_one
+    
+    
+i = 0
 for n in names:
     f = open('ordering_list_' + n + '.txt','ab')
-    np.savetxt(f, data, delimiter = " ")
+    np.savetxt(f, new_data[i], delimiter = " ")
     f.close()
+    i += 1
 
 

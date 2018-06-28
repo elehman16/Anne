@@ -90,7 +90,7 @@ class CSVWriter(Writer):
         annotations = eval(form['annotations'])
         userid = form['userid'] 
         id_ = form['id']
-        promptid = int(form['pid'])
+        promptid = form['pid']
         selection = form['selection']
         outcome = form['outcome']
         comparator = form['comparator']

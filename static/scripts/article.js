@@ -127,7 +127,7 @@ function submit() {
         $("#myModal").modal('show');
     } else if (annotations.length > 0 || selection === 'Cannot tell based on the abstract') {
         post("/submit/", {"userid": userid,
-                          "pid": pid, 
+                          "pid": pid,
                           "id": id,
                           "annotations": JSON.stringify(annotations),
                           "selection": selection,
@@ -144,6 +144,7 @@ function submit() {
 function submit_invalid_prompt() {
   var userid = document.getElementById("userid").innerHTML;
   var id = document.getElementById("id").innerHTML;
+  var pid = document.getElementById("pid").innerHTML;
   var text = document.getElementById("response").value;
   var selection = getCheckBoxSelection();
   var outcome = document.getElementById("outcome_save").innerHTML;
@@ -152,7 +153,7 @@ function submit_invalid_prompt() {
   var xml_file = document.getElementById("xml_file").innerHTML;
 
   if (text !== '') {
-    post("/submit/", {"userid": userid, "id": id,
+    post("/submit/", {"userid": userid, "id": id, "pid": pid,
                       "annotations": JSON.stringify([text]),
                       "selection": selection,
                       "outcome": outcome,

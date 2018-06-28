@@ -100,6 +100,7 @@ function getCheckBoxSelection() {
 function submit() {
     var userid = document.getElementById("userid").innerHTML;
     var id = document.getElementById("id").innerHTML;
+    var pid = document.getElementById("pid").innerHTML;
     var annotations = getFinalText();
     var selection = getCheckBoxSelection();
     var outcome = document.getElementById("outcome_save").innerHTML;
@@ -126,6 +127,7 @@ function submit() {
         $("#myModal").modal('show');
     } else if (annotations.length > 0 || selection === 'Cannot tell based on the abstract') {
         post("/submit/", {"userid": userid,
+                          "pid": pid, 
                           "id": id,
                           "annotations": JSON.stringify(annotations),
                           "selection": selection,

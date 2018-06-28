@@ -40,9 +40,10 @@ class CSVWriter(Writer):
         self.write_file = write_file
 
     def submit_annotation(self, data):
-        row_heading = ['user_id', 'pmid_id', 'selection', 
+        row_heading = ['user_id', 'prompt id', 'pmid_id', 'selection', 
                        'annotation', 'outcome', 'comparator', 
                        'intervention', 'invalid prompt', 'prompt reason']
+                       
         if (data['selection'] != 'Cannot tell based on the abstract'):
             self.update_user_progress(data['userid'])
                                
@@ -89,6 +90,7 @@ class CSVWriter(Writer):
         annotations = eval(form['annotations'])
         userid = form['userid'] 
         id_ = form['id']
+        promptid = int(form['pid'])
         selection = form['selection']
         outcome = form['outcome']
         comparator = form['comparator']
@@ -104,16 +106,12 @@ class CSVWriter(Writer):
             if (i != (len(annotations) - 1)):
                 annotation_str += ","     
         
-            ['user_id', 'pmid_id', 'selection', 
-            'annotation', 'outcome', 'comparator', 
-            'intervention', 'invalid prompt', 'prompt reason']
-            
         if (selection == "Invalid Prompt"):
             prompt_reason = annotation_str
             annotation_str = ""
             invalid_prompt = 1
             
-        save_data = [userid, id_, selection, annotation_str, outcome, 
+        save_data = [userid, promptid, id_, selection, annotation_str, outcome, 
                      comparator, intervention, invalid_prompt, prompt_reason]
                 
         

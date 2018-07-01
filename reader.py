@@ -289,8 +289,7 @@ class XMLReader(Reader):
             return None
             
         pmc = self.by_row_description[int(next_file)][0]['XML']
-        print(pmc)
-        path_to_file =  self.path + '//PMC' + str(pmc) + '.nxml' # the path to XML files
+        path_to_file =  self.path + '//PMC' + str(pmc).trim(" ") + '.nxml' # the path to XML files
         et = ET.parse(path_to_file) 
         root = et.getroot() 
         

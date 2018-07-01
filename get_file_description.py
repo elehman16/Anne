@@ -17,7 +17,7 @@ def get_file_description():
     labels = get_labels()
     for i in range(1, len(all_rows)):
         row = all_rows[i]
-        name = row[labels.index('XML')] # the name of the PMC file
+        name = row[labels.index('XML')].replace("b' ", "").replace("'", "").strip() # the name of the PMC file
         if name in data:
             data[name].append(gen_row_dictionary(labels, row))
         else:

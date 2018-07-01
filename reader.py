@@ -257,7 +257,7 @@ class XMLReader(Reader):
         art = article.Article(id_= id_, title=title, text=text)
         art.get_extra()['path'] = next_file
                 
-        file_data = self.file_description[int(id_)]
+        file_data = self.file_description[str(id_)]
         sp_file_data = None
         for row in file_data:
             if (row['Unnamed: 0'] == int(next_file)):

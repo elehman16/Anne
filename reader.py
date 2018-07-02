@@ -260,7 +260,7 @@ class XMLReader(Reader):
         file_data = self.file_description[str(id_)]
         sp_file_data = None
         for row in file_data:
-            if (row['Unnamed: 0'] == int(next_file)):
+            if (int(row['Unnamed: 0']) == int(next_file)):
                 sp_file_data = row
                 
         art.get_extra()['outcome'] = sp_file_data['Outcome']

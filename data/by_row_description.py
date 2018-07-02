@@ -18,10 +18,12 @@ def by_row_description():
     for i in range(1, len(all_rows)):
         row = all_rows[i]
         name = row[labels.index('Unnamed: 0')] # the name of the PMC file
+        if (name == 'Unnamed: 0'):
+            continue
         if name in data:
-            data[name].append(gen_row_dictionary(labels, row))
+            data[int(name)].append(gen_row_dictionary(labels, row))
         else:
-            data[name] = [gen_row_dictionary(labels, row)]
+            data[int(name)] = [gen_row_dictionary(labels, row)]
     
     return data
     

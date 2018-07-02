@@ -9,8 +9,8 @@ import random
 import pandas as pd
 import numpy as np
 
-st = 214
-end = 485
+st = 621
+end = 968
 
 data = list(range(st, end))
 random.shuffle(data)

@@ -110,14 +110,14 @@ function submit() {
 
     // Modify the necessary annotations to include the whole table.
     for (var j = 0; j < annotations.length; j++) {
-    // Determine if this is in a table.
+      // Determine if this is in a table.
       var trs = document.getElementsByTagName("tr");
       var text = annotations[j];
       for (var i = 0; i < trs.length; i++) {
         var tr = trs[i];
         var txt = tr.innerText;
         // Check if either are a substring of another -> if so, save it.
-        if (text.indexOf(txt) != -1 || txt.indexOf(text) != -1) {
+        if (txt != "" && (text.indexOf(txt) != -1 || txt.indexOf(text) != -1)) {
           annotations[j] = tr.innerHTML;
         }
       }

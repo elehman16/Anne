@@ -263,9 +263,9 @@ class XMLReader(Reader):
             if (int(row['Unnamed: 0']) == int(next_file)):
                 sp_file_data = row
                 
-        art.get_extra()['outcome'] = sp_file_data['Outcome']
-        art.get_extra()['comparator'] = sp_file_data['Comparator']
-        art.get_extra()['intervention'] = sp_file_data['Intervention']
+        art.get_extra()['outcome'] = sp_file_data['Outcome'].encode('cp1252').decode('utf-8')
+        art.get_extra()['comparator'] = sp_file_data['Comparator'].encode('cp1252').decode('utf-8')
+        art.get_extra()['intervention'] = sp_file_data['Intervention'].encode('cp1252').decode('utf-8')
                 
         text.insert(1, ["Title", [['Article Title', title], 
                                   ['PMC id', sp_file_data['XML']]]])

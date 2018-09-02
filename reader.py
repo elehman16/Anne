@@ -262,11 +262,23 @@ class XMLReader(Reader):
         for row in file_data:
             if (int(row['Unnamed: 0']) == int(next_file)):
                 sp_file_data = row
-                
-        art.get_extra()['outcome'] = sp_file_data['Outcome'].encode('cp1252').decode('utf-8')
-        art.get_extra()['comparator'] = sp_file_data['Comparator'].encode('cp1252').decode('utf-8')
-        art.get_extra()['intervention'] = sp_file_data['Intervention'].encode('cp1252').decode('utf-8')
-                
+         
+        try:
+            art.get_extra()['outcome'] = sp_file_data['Outcome'].encode('cp1252').decode('utf-8')
+        except:
+            art.get_extra()['outcome'] = sp_file_data['Outcome']
+        
+        try:
+            art.get_extra()['comparator'] = sp_file_data['Comparator'].encode('cp1252').decode('utf-8')
+        except:
+            art.get_extra()['comparator'] = sp_file_data['Comparator']
+            
+        try: 
+            art.get_extra()['intervention'] = sp_file_data['Intervention'].encode('cp1252').decode('utf-8')
+        except:
+            art.get_extra()['intervention'] = sp_file_data['Intervention']
+            
+            
         text.insert(1, ["Title", [['Article Title', title], 
                                   ['PMC id', sp_file_data['XML']]]])
         

@@ -11,7 +11,7 @@ Read in the CSV file and get the required data from it. Format the data.
 """
 def get_file_description():
     data = {}
-    all_rows = pd.read_csv(csv_file_loc)
+    all_rows = pd.read_csv(csv_file_loc, encoding = 'utf-8')
     all_rows = np.asarray(all_rows)
     
     labels = get_labels()

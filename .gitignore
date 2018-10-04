@@ -1,0 +1,6 @@
+__pycachce__/ 
+__pycache__/ 
+data/old_prompt_gen.csv 
+data/user_progress.csv~ 
+data/.user_progress.csv.un~ 
+all_outputs 
